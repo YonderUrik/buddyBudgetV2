@@ -7,6 +7,19 @@ import copy
 import pandas as pd
 from bson.objectid import ObjectId
 
+def edit_category_name(data, category_id, new_category_name):
+    for category in data:
+        if category['category_id'] == category_id:
+            category['category_name'] = new_category_name
+            return data
+
+def edit_sub_category_name(data, category_id, sub_category_id, new_sub_category_name):
+    for category in data:
+        if category['category_id'] == category_id:
+            for subCategory in category['subcategories']:
+                if subCategory['subcategory_id'] == sub_category_id:
+                    subCategory['subcategory_name'] = new_sub_category_name
+                    return data
 
 class CategorieMongo(BaseMongo):
     """
@@ -17,6 +30,41 @@ class CategorieMongo(BaseMongo):
         Init CategorieMongo -> Extend BaseMongo 
         """
         super(CategorieMongo, self).__init__()
+
+    def edit_sub_category(self, user_id=None, category_id=None, sub_category_id=None, new_sub_category_name=None, transaction_type=None):
+        try:
+            collection = self.client[user_id][VARS.SETTINGS_COLLECTION]
+
+            categories = collection.find_one({"type": "budgetting-categories"})
+            categories = categories[transaction_type]
+
+            edited_category = edit_sub_category_name(categories, category_id, sub_category_id, new_sub_category_name)
+
+            collection.update_one(
+                {"type": "budgetting-categories"},
+                {"$set" : {transaction_type : edited_category}}
+            )
+
+            return 200, "Sotto categoria modificata"
+        except Exception as e:
+            return 500 , str(e)
+
+    def edit_category_name(self, user_id=None, category_id=None, new_category_name=None, transaction_type=None):
+        try:
+            collection = self.client[user_id][VARS.SETTINGS_COLLECTION]
+            categories = collection.find_one({"type": "budgetting-categories"})
+
+            categories = categories[transaction_type]
+
+            edited_category = edit_category_name(categories, category_id, new_category_name)
+
+            collection.update_one(
+                {"type": "budgetting-categories"},
+                {"$set" : {transaction_type : edited_category}}
+            )
+            return 200, "Categoria modificata"
+        except Exception as e:
+            return 500, str(e)
 
     def get_categories_statistics(self, user_id=None, selectedDateOption=None):
         try:
@@ -67,8 +115,6 @@ class CategorieMongo(BaseMongo):
             ]
 
             result = list(collection.aggregate(pipeline))
-
-            print(result)
             return 200, result
         except Exception as e:
             return 500, str(e)

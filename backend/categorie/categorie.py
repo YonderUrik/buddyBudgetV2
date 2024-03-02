@@ -45,3 +45,58 @@ def get_categories_statistics():
         return {"message" : "Impossibile recuperare le ultime transazioni"}, 500
     finally:
         mongo.client.close()
+
+@bp.route('/edit-subcategory-name', methods=["POST"])
+@jwt_required()
+def edit_sub_category_name():
+    try:
+        mongo = AuthMongo()
+        _user_email = get_jwt_identity()['email']
+        user_details = mongo.get_user_by_email(_user_email)
+        user_id = str(user_details['_id'])
+
+        category_id = int(request.json.get("category_id"))
+        sub_category_id = int(request.json.get("sub_category_id"))
+        new_sub_category_name = str(request.json.get("new_sub_category_name"))
+        transaction_type = str(request.json.get("transaction_type"))
+
+        mongo = CategorieMongo()
+
+        status, result = mongo.edit_sub_category(user_id=user_id, category_id=category_id, sub_category_id=sub_category_id, new_sub_category_name=new_sub_category_name, transaction_type=transaction_type)
+
+        if status != 200:
+            raise Exception(result)
+        
+        return {"message": result}, status
+    except Exception as e:
+        logger.error(e)
+        return {"message" : "Qualcosa non ha funzionato, riprova"}, 500
+    finally:
+        mongo.client.close()
+
+@bp.route('/edit-category-name', methods=["POST"])
+@jwt_required()
+def edit_category_name():
+    try:
+        mongo = AuthMongo()
+        _user_email = get_jwt_identity()['email']
+        user_details = mongo.get_user_by_email(_user_email)
+        user_id = str(user_details['_id'])
+        
+        category_id = int(request.json.get("category_id"))
+        new_category_name = str(request.json.get("new_category_name"))
+        transaction_type = str(request.json.get("transaction_type"))
+
+        mongo = CategorieMongo()
+
+        status, result = mongo.edit_category_name(user_id=user_id, category_id=category_id, new_category_name=new_category_name, transaction_type=transaction_type)
+
+        if status != 200:
+            raise Exception(result)
+        
+        return {"message" : result}, status
+    except Exception as e:
+        logger.error(e)
+        return {"message" : "Qualcosa non ha funzionato, riprova"}, 500
+    finally:
+        mongo.client.close()

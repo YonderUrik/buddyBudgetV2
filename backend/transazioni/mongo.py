@@ -349,8 +349,6 @@ class TransazioniMongo(BaseMongo):
                 filtersDate = UTILS.DATE_OPTIONS_MAP[selectedDateOption]
                 converted_logic_operators["date"] = {"$gte": filtersDate['start_date'], "$lte": filtersDate['end_date']}
 
-            print(converted_logic_operators)
-            print(selectedDateOption)
             nr_of_docs = mongo.count_documents(converted_logic_operators)
 
             if nr_of_docs == 0:
@@ -464,7 +462,6 @@ class TransazioniMongo(BaseMongo):
 
                         # Estraggo i valori della banca che devono essere aggiornati con il nuovo balance
                         bank_documents_to_edit = list(banks_collection.find({"cardName": transaction_db['cardName'], "lastUpdate": {"$gte": transaction_db['date']}}))
-                        print(bank_documents_to_edit)
                         logger.info(f"Documenti trovati : {len(bank_documents_to_edit)}")
                         if bank_documents_to_edit:
                             for elem in bank_documents_to_edit:

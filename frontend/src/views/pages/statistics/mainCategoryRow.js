@@ -1,25 +1,28 @@
-import { fCurrency } from 'src/utils/format-number'
+import toast from 'react-hot-toast'
+import { useState } from 'react'
+
 import {
   Box,
-  useTheme,
   Typography,
-  Stack,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Button,
   TextField,
   IconButton,
   Tooltip
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { useState } from 'react'
+
+import { fCurrency } from 'src/utils/format-number'
 import Icon from 'src/@core/components/icon'
+import axios from 'src/utils/axios'
+import { LoadingButton } from '@mui/lab'
+import SubCategoryRow from './subCategoryRow'
 
 const MainCategoryRow = props => {
-  const theme = useTheme()
   const { category, categoryStats, transactionType } = props
   const singleCatStat = categoryStats?.categories.find(ct => ct.categoryId === category.category_id)
+  const [isSaving, setIsSaving] = useState(false)
 
   const [editedCategoryName, setEditedCategoryName] = useState(category.category_name)
   const [isEditing, setIsEditing] = useState(false)
@@ -28,11 +31,27 @@ const MainCategoryRow = props => {
     setEditedCategoryName(event.target.value)
   }
 
-  const handleSaveCategoryEdit = async () => {}
+  const handleSaveCategoryEdit = async event => {
+    event.stopPropagation()
+    try {
+      setIsSaving(true)
+      await axios.post('/categorie/edit-category-name', {
+        category_id: category.category_id,
+        new_category_name: editedCategoryName,
+        transaction_type: transactionType
+      })
+      toast.success('Nome categoria modificato')
+      setIsEditing(false)
+    } catch (error) {
+      toast.error(error.message || error)
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   return (
     <Accordion sx={{ mx: 3, bgcolor: 'background.default', boxShadow: 0 }}>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />} onClick={event => event.stopPropagation()}>
         <Box sx={{ ml: 3, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box sx={{ mr: 2, display: 'flex', flexDirection: 'column' }}>
             <Typography variant='h6' sx={{ fontWeight: 600, color: 'text.primary' }}>
@@ -55,15 +74,16 @@ const MainCategoryRow = props => {
             {isEditing ? (
               <>
                 <Tooltip title='Salva cambiamento'>
-                  <IconButton color='success' onClick={handleSaveCategoryEdit}>
+                  <LoadingButton loading={isSaving} color='success' onClick={handleSaveCategoryEdit}>
                     <Icon icon='material-symbols-light:save' />
-                  </IconButton>
+                  </LoadingButton>
                 </Tooltip>
                 <Tooltip title='Annulla azione'>
                   <IconButton
                     color='error'
-                    onClick={() => {
-                      setIsEditing()
+                    onClick={event => {
+                      event.stopPropagation()
+                      setIsEditing(false)
                       setEditedCategoryName(category.category_name)
                     }}
                   >
@@ -73,7 +93,12 @@ const MainCategoryRow = props => {
               </>
             ) : (
               <Tooltip title='Modifica nome categoria'>
-                <IconButton onClick={() => setIsEditing(true)}>
+                <IconButton
+                  onClick={event => {
+                    setIsEditing(true)
+                    event.stopPropagation()
+                  }}
+                >
                   <Icon icon='material-symbols:edit' />
                 </IconButton>
               </Tooltip>
@@ -87,34 +112,13 @@ const MainCategoryRow = props => {
       <AccordionDetails>
         {category?.subcategories &&
           category?.subcategories.map(subcategory => (
-            <Box
-              sx={{
-                p: 3,
-                mx: 3,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                bgcolor: 'background.paper',
-                my: 3,
-                borderRadius: 1,
-                border: 1,
-                borderColor: 'text.disabled'
-              }}
-            >
-              <Box sx={{ mr: 2, display: 'flex', flexDirection: 'column' }}>
-                <Typography variant='body2' sx={{ fontWeight: 600, color: 'text.primary' }}>
-                  {subcategory.subcategory_name}
-                </Typography>
-              </Box>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'flex-end' }}>
-                <Typography variant='body2' sx={{ fontWeight: 600, color: 'text.primary' }}>
-                  {fCurrency(
-                    singleCatStat?.subcategories.find(sub => sub.subCategoryId === subcategory.subcategory_id)
-                      ?.totalAmount
-                  )}
-                </Typography>
-              </Box>
-            </Box>
+            <SubCategoryRow
+              key={`${subcategory.subcategory_id}-${category.category_id}`}
+              subcategory={subcategory}
+              category_id={category.category_id}
+              transactionType={transactionType}
+              singleCatStat={singleCatStat}
+            />
           ))}
       </AccordionDetails>
     </Accordion>

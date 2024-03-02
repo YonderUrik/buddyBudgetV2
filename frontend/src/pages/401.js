@@ -39,13 +39,13 @@ const Error401 = () => {
             401
           </Typography>
           <Typography variant='h5' sx={{ mb: 2.5, fontSize: '1.5rem !important' }}>
-            You are not authorized! 🔐
+            Non autorizzato! 🔐
           </Typography>
-          <Typography variant='body2'>You don&prime;t have permission to access this page. Go Home!</Typography>
+          <Typography variant='body2'>Non possiedi i giusti permessi per accedere a questa pagina</Typography>
         </BoxWrapper>
         <Img alt='error-illustration' src='/images/pages/401.png' />
         <Button href='/' component={Link} variant='contained' sx={{ px: 5.5 }}>
-          Back to Home
+          Torna alla home
         </Button>
       </Box>
     </Box>

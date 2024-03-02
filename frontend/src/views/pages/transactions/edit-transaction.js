@@ -1,14 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // ** MUI Imports
 import Drawer from '@mui/material/Drawer'
-import Select from '@mui/material/Select'
 import Button from '@mui/material/Button'
-import MenuItem from '@mui/material/MenuItem'
 import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
-import InputLabel from '@mui/material/InputLabel'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import FormControl from '@mui/material/FormControl'
@@ -22,15 +19,7 @@ import { useForm, Controller } from 'react-hook-form'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
-import {
-  Autocomplete,
-  ButtonGroup,
-  CircularProgress,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-  Tooltip
-} from '@mui/material'
+import { Autocomplete, CircularProgress, Stack, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material'
 import toast from 'react-hot-toast'
 import axios from 'src/utils/axios'
 import { LoadingButton } from '@mui/lab'
@@ -120,13 +109,9 @@ const EditTransactionDrawer = props => {
     }
   }, [row.type, categories, subcategories])
 
-
   const {
     reset,
     control,
-    setValue,
-    setError,
-    watch,
     handleSubmit,
     formState: { isSubmitting },
     formState: { errors }
@@ -182,7 +167,7 @@ const EditTransactionDrawer = props => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <FormControl fullWidth sx={{ mb: 5 }}>
               {/* BUTTON TOGGLE TRANSACTION TYPE */}
-              <ToggleButtonGroup value={row.type} exclusive sx={{ mb: 5 }} variant='contained'>
+              <ToggleButtonGroup size='small' value={row.type} exclusive sx={{ mb: 5 }} variant='contained'>
                 <ToggleButton color='success' value='in'>
                   <Icon icon='majesticons:money-plus-line' /> Entrata
                 </ToggleButton>

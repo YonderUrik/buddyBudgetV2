@@ -3,13 +3,10 @@ import { useCallback, useEffect, useState } from 'react'
 
 // ** MUI Imports
 import Drawer from '@mui/material/Drawer'
-import Select from '@mui/material/Select'
 import Button from '@mui/material/Button'
-import MenuItem from '@mui/material/MenuItem'
 import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
-import InputLabel from '@mui/material/InputLabel'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import FormControl from '@mui/material/FormControl'
@@ -23,7 +20,7 @@ import { useForm, Controller } from 'react-hook-form'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
-import { Autocomplete, ButtonGroup, CircularProgress, Stack, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { Autocomplete, CircularProgress, Stack, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import toast from 'react-hot-toast'
 import axios from 'src/utils/axios'
 import { LoadingButton } from '@mui/lab'
@@ -67,6 +64,24 @@ const AddTransactionDrawer = props => {
 
   const [schema, setSchema] = useState(yup.object().shape())
   const [defaultValues, setDefaultSchema] = useState({})
+
+  const {
+    reset,
+    control,
+    watch,
+    handleSubmit,
+    formState: { isSubmitting },
+    formState: { errors }
+  } = useForm({
+    defaultValues,
+    mode: 'onChange',
+    resolver: yupResolver(schema)
+  })
+
+  const handleClose = () => {
+    setOpen(false)
+    reset()
+  }
 
   useEffect(() => {
     if (transactionType === 'transfer') {
@@ -113,7 +128,7 @@ const AddTransactionDrawer = props => {
       setDefaultSchema(TMPdefaultValues)
       reset(TMPdefaultValues)
     }
-  }, [transactionType, contiList])
+  }, [transactionType, contiList, reset])
 
   const getContiSummary = useCallback(async () => {
     setIsLoading(true)
@@ -149,21 +164,6 @@ const AddTransactionDrawer = props => {
     getCategories()
   }, [getContiSummary, getCategories])
 
-  const {
-    reset,
-    control,
-    setValue,
-    setError,
-    watch,
-    handleSubmit,
-    formState: { isSubmitting },
-    formState: { errors }
-  } = useForm({
-    defaultValues,
-    mode: 'onChange',
-    resolver: yupResolver(schema)
-  })
-
   const onSubmit = async data => {
     try {
       await axios.post('/transazioni/add-transaction', data)
@@ -175,10 +175,7 @@ const AddTransactionDrawer = props => {
     }
   }
 
-  const handleClose = () => {
-    setOpen(false)
-    reset()
-  }
+
 
   const handleTransactionType = (event, newType) => {
     if (newType !== null) {
@@ -223,8 +220,9 @@ const AddTransactionDrawer = props => {
                 value={transactionType}
                 exclusive
                 onChange={handleTransactionType}
-                sx={{ mb: 5 }}
+                sx={{ mb: 5, display: 'flex', flexWrap: 'wrap' }}
                 variant='contained'
+                size='small'
               >
                 <ToggleButton color='success' value='in'>
                   <Icon icon='majesticons:money-plus-line' /> Entrata

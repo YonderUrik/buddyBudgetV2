@@ -15,13 +15,13 @@ const Statistiche = () => {
   const [selectedDateOption, setSelectedDateOption] = useState(dateOptions[0])
 
   const filteredList = list.find(ls => ls._id === transactionType)
+  const filteredCategories = categoriesList[transactionType]
 
   const getList = useCallback(async () => {
     setIsLoading(true)
     try {
       const response = await axios.post('/categorie/get-categories-statistics', { selectedDateOption })
       const { data } = response
-      console.log('data', data)
       setList(data)
     } catch (error) {
       toast.error(error.message || error)
@@ -61,7 +61,7 @@ const Statistiche = () => {
             sx={{
               display: 'flex',
               alignItems: 'center',
-              alignContent: 'center',
+              alignContent: 'center'
             }}
           >
             {isLoading && <CircularProgress size={20} />}
@@ -89,9 +89,8 @@ const Statistiche = () => {
 
         <Box key={transactionType}>
           {!isLoading &&
-            filteredList &&
             Object.keys(categoriesList).length > 0 &&
-            categoriesList[transactionType].map(category => (
+            filteredCategories.map(category => (
               <MainCategoryRow
                 key={category.category_id}
                 category={category}

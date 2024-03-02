@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { ca } from 'date-fns/locale'
 
 import { HOST_API } from './config-global'
 

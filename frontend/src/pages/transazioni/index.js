@@ -40,6 +40,7 @@ export const SORT_OPTIONS = [
 const Transazioni = () => {
   const theme = useTheme()
   const [anchorEl, setAnchorEl] = useState(null)
+
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 25,
@@ -65,6 +66,7 @@ const Transazioni = () => {
   const getDataList = async newPaginationModel => {
     try {
       setIsLoading(true)
+
       const response = await axios.post('/transazioni/get-transactions', {
         page: newPaginationModel.page + 1,
         pageSize: newPaginationModel.pageSize,
@@ -163,6 +165,7 @@ const Transazioni = () => {
                     oldPagination.sort[option.field] = option.value
                     setPaginationModel(oldPagination)
                     getDataList(oldPagination)
+
                     // onSort(option.value)
                   }}
                 >

@@ -39,13 +39,13 @@ const Error500 = () => {
             500
           </Typography>
           <Typography variant='h5' sx={{ mb: 2.5, fontSize: '1.5rem !important' }}>
-            Internal server error 👨🏻‍💻
+            Errore 👨🏻‍💻
           </Typography>
-          <Typography variant='body2'>Oops, something went wrong!</Typography>
+          <Typography variant='body2'>Qualcosa non è andato, riprova!</Typography>
         </BoxWrapper>
         <Img alt='error-illustration' src='/images/pages/500.png' />
         <Button href='/' component={Link} variant='contained' sx={{ px: 5.5 }}>
-          Back to Home
+          Torna alla home
         </Button>
       </Box>
     </Box>

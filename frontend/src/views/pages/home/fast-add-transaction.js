@@ -1,47 +1,22 @@
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
-import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 import Grid from '@mui/material/Grid'
-import { styled, useTheme } from '@mui/material/styles'
 import { useAuth } from 'src/hooks/useAuth'
 import Icon from 'src/@core/components/icon'
 import { useCallback, useEffect, useState } from 'react'
 import { fCurrency } from 'src/utils/format-number'
 import toast from 'react-hot-toast'
 import axios from 'src/utils/axios'
-import { useRouter } from 'next/router'
 import { IconButton, Tooltip } from '@mui/material'
 import AddTransactionDrawer from '../transactions/add-transaction-drawer'
-
-// Styled Grid component
-const StyledGrid = styled(Grid)(({ theme }) => ({
-  [theme.breakpoints.down('sm')]: {
-    order: -1,
-    display: 'flex',
-    justifyContent: 'center'
-  }
-}))
-
-// Styled component for the image
-const Img = styled('img')(({ theme }) => ({
-  right: 0,
-  bottom: 0,
-  width: 298,
-  position: 'absolute',
-  [theme.breakpoints.down('sm')]: {
-    width: 250,
-    position: 'static'
-  }
-}))
 
 const FastAddTransaction = props => {
   // ** Hook
   const [netWorth, setNetWorth] = useState(0)
   const auth = useAuth()
-  const router = useRouter()
 
   const { onChangeShowBalance, balanceview, refreshAllData } = props
 

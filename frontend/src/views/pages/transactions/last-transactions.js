@@ -14,7 +14,7 @@ import CardHeader from '@mui/material/CardHeader'
 import TableContainer from '@mui/material/TableContainer'
 
 import axios from 'src/utils/axios'
-import { fDate, fDateTime } from 'src/utils/format-time'
+import { fDate } from 'src/utils/format-time'
 import { fCurrency } from 'src/utils/format-number'
 
 import DeleteTransaction from './delete-transaction'
