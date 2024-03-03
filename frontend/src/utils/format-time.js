@@ -4,18 +4,29 @@ import { format, getTime, formatDistanceToNow, formatDistance } from 'date-fns'
 
 export function fDate(date, newFormat) {
   const fm = newFormat || 'dd MMM yyyy'
-
-  return date ? format(new Date(date), fm) : ''
+  try {
+    return date ? format(new Date(date), fm) : ''
+  } catch (error) {
+    return date
+  }
 }
 
 export function fDateTime(date, newFormat) {
   const fm = newFormat || 'dd MMM yyyy p'
 
-  return date ? format(new Date(date), fm) : ''
+  try {
+    return date ? format(new Date(date), fm) : ''
+  } catch (error) {
+    return date
+  }
 }
 
 export function fTimestamp(date) {
-  return date ? getTime(new Date(date)) : ''
+  try {
+    return date ? getTime(new Date(date)) : ''
+  } catch (error) {
+    return date
+  }
 }
 
 export function fToNow(date) {
@@ -26,8 +37,6 @@ export function fToNow(date) {
         })
       : ''
   } catch (error) {
-    console.error(error)
-
     return date
   }
 }
