@@ -58,6 +58,10 @@ def edit_sub_category_name():
         category_id = int(request.json.get("category_id"))
         sub_category_id = int(request.json.get("sub_category_id"))
         new_sub_category_name = str(request.json.get("new_sub_category_name"))
+
+        if new_sub_category_name.strip() == '':
+            raise Exception("Non è possibile inserire un nome vuoto")
+
         transaction_type = str(request.json.get("transaction_type"))
 
         mongo = CategorieMongo()
@@ -86,6 +90,9 @@ def edit_category_name():
         category_id = int(request.json.get("category_id"))
         new_category_name = str(request.json.get("new_category_name"))
         transaction_type = str(request.json.get("transaction_type"))
+
+        if new_category_name.strip() == '':
+            raise Exception("Non è possibile inserire un nome vuoto")
 
         mongo = CategorieMongo()
 

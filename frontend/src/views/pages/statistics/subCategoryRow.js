@@ -54,26 +54,18 @@ const SubCategoryRow = props => {
     >
       <Box sx={{ mr: 2, display: 'flex', flexDirection: 'column' }}>
         {isEditing ? (
-          <TextField
-            size='small'
-            value={editedSubCategory}
-            onChange={handleSubcategoryNameChange}
-            autoFocus
-            fullWidth
-          />
-        ) : (
-          <Typography variant='body2' sx={{ fontWeight: 600, color: 'text.primary' }}>
-            {editedSubCategory}
-          </Typography>
-        )}
-      </Box>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'flex-end' }}>
-        {isEditing ? (
-          <>
+          <Box sx={{ display: 'flex', alignContent: 'center', alignItems: 'center' }}>
+            <TextField
+              size='small'
+              value={editedSubCategory}
+              onChange={handleSubcategoryNameChange}
+              autoFocus
+              fullWidth
+            />
             <Tooltip title='Salva cambiamento'>
-              <LoadingButton loading={isSaving} color='success' onClick={handleSaveSubCategoryEdit}>
-                <Icon icon='material-symbols-light:save' />
-              </LoadingButton>
+              <IconButton color='success' onClick={handleSaveSubCategoryEdit}>
+                <Icon icon='fluent:save-20-regular' />
+              </IconButton>
             </Tooltip>
             <Tooltip title='Annulla azione'>
               <IconButton
@@ -84,21 +76,28 @@ const SubCategoryRow = props => {
                   setEditedSubCategory(subcategory.subcategory_name)
                 }}
               >
-                <Icon icon='material-symbols-light:cancel' />
+                <Icon icon='material-symbols-light:cancel-outline' />
               </IconButton>
             </Tooltip>
-          </>
+          </Box>
         ) : (
-          <Tooltip title='Modifica nome sotto-categoria'>
-            <IconButton
-              onClick={() => {
-                setIsEditing(true)
-              }}
-            >
-              <Icon icon='material-symbols:edit' />
-            </IconButton>
-          </Tooltip>
+          <Box sx={{ display: 'flex', alignContent: 'center', alignItems: 'center' }}>
+            <Tooltip title='Modifica nome sotto-categoria'>
+              <IconButton
+                onClick={() => {
+                  setIsEditing(true)
+                }}
+              >
+                <Icon icon='fluent:edit-20-regular' />
+              </IconButton>
+            </Tooltip>
+            <Typography variant='body2' sx={{ fontWeight: 600, color: 'text.primary' }}>
+              {editedSubCategory}
+            </Typography>
+          </Box>
         )}
+      </Box>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'flex-end' }}>
         <Typography variant='body2' sx={{ fontWeight: 600, color: 'text.primary' }}>
           {fCurrency(
             singleCatStat?.subcategories.find(sub => sub.subCategoryId === subcategory.subcategory_id)?.totalAmount

@@ -56,53 +56,52 @@ const MainCategoryRow = props => {
           <Box sx={{ mr: 2, display: 'flex', flexDirection: 'column' }}>
             <Typography variant='h6' sx={{ fontWeight: 600, color: 'text.primary' }}>
               {isEditing ? (
-                <TextField
-                  size='small'
-                  value={editedCategoryName}
-                  onChange={handleCategoryNameChange}
-                  autoFocus
-                  fullWidth
-                />
+                <Box sx={{ display: 'flex', alignContent: 'center', alignItems: 'center' }}>
+                  <TextField
+                    size='small'
+                    value={editedCategoryName}
+                    onChange={handleCategoryNameChange}
+                    autoFocus
+                    fullWidth
+                  />
+                  <Tooltip title='Salva cambiamento'>
+                    <IconButton color='success' onClick={handleSaveCategoryEdit}>
+                      <Icon icon='fluent:save-20-regular' />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title='Annulla azione'>
+                    <IconButton
+                      color='error'
+                      onClick={event => {
+                        event.stopPropagation()
+                        setIsEditing(false)
+                        setEditedCategoryName(category.category_name)
+                      }}
+                    >
+                      <Icon icon='material-symbols-light:cancel-outline' />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
               ) : (
-                <Typography variant='h6' sx={{ fontWeight: 600, color: 'text.primary' }}>
-                  {editedCategoryName}
-                </Typography>
+                <Box sx={{ display: 'flex', alignContent: 'center', alignItems: 'center' }}>
+                  <Tooltip title='Modifica nome categoria'>
+                    <IconButton
+                      onClick={event => {
+                        setIsEditing(true)
+                        event.stopPropagation()
+                      }}
+                    >
+                      <Icon icon='fluent:edit-20-regular' />
+                    </IconButton>
+                  </Tooltip>
+                  <Typography variant='h6' sx={{ fontWeight: 600, color: 'text.primary' }}>
+                    {editedCategoryName}
+                  </Typography>
+                </Box>
               )}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'flex-end' }}>
-            {isEditing ? (
-              <>
-                <Tooltip title='Salva cambiamento'>
-                  <LoadingButton loading={isSaving} color='success' onClick={handleSaveCategoryEdit}>
-                    <Icon icon='material-symbols-light:save' />
-                  </LoadingButton>
-                </Tooltip>
-                <Tooltip title='Annulla azione'>
-                  <IconButton
-                    color='error'
-                    onClick={event => {
-                      event.stopPropagation()
-                      setIsEditing(false)
-                      setEditedCategoryName(category.category_name)
-                    }}
-                  >
-                    <Icon icon='material-symbols-light:cancel' />
-                  </IconButton>
-                </Tooltip>
-              </>
-            ) : (
-              <Tooltip title='Modifica nome categoria'>
-                <IconButton
-                  onClick={event => {
-                    setIsEditing(true)
-                    event.stopPropagation()
-                  }}
-                >
-                  <Icon icon='material-symbols:edit' />
-                </IconButton>
-              </Tooltip>
-            )}
             <Typography variant='body2' sx={{ fontWeight: 600, color: 'text.primary' }}>
               {fCurrency(singleCatStat?.totalAmount)}
             </Typography>

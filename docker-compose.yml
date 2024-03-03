@@ -1,0 +1,31 @@
+version: '3.7'
+
+networks:
+  subsidia-network:
+    external: true
+    driver: overlay
+
+secrets:
+  mongodb-root-username:
+    external: true
+  mongodb-root-password:
+    external: true
+
+services:
+  backend:
+    secrets:
+      - mongodb-root-username
+      - mongodb-root-password
+    image: buddy-budget:2.0.0
+    ports:
+      - "8317:5555"
+    environment:
+      - MONGO_HOST=mongodb:27017
+      - mongodb_username=/run/secrets/mongodb-root-username
+      - mongodb_password=/run/secrets/mongodb-root-password
+    deploy:
+      replicas: 5
+      placement:
+        constraints: [node.role == manager]
+    networks:
+      - subsidia-network
