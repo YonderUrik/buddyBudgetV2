@@ -51,6 +51,7 @@ const AuthProvider = ({ children }) => {
             router.replace('/login')
           })
       } else {
+        window.localStorage.removeItem('user')
         setLoading(false)
         router.replace('/login')
       }
