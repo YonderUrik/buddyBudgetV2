@@ -31,6 +31,7 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       const storedToken = document.cookie.split('; ').find(row => row.startsWith(authConfig.storageTokenKeyName + '='))
+      console.log('storedToken', storedToken)
       if (storedToken) {
         setLoading(true)
         const token = storedToken.split('=')[1]
@@ -47,12 +48,11 @@ const AuthProvider = ({ children }) => {
             document.cookie = `${authConfig.storageTokenKeyName}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`
             setUser(null)
             setLoading(false)
-            if (authConfig.onTokenExpiration === 'logout' && !router.pathname.includes('login')) {
-              router.replace('/login')
-            }
+            router.replace('/login')
           })
       } else {
         setLoading(false)
+        router.replace('/login')
       }
     }
     initAuth()
