@@ -71,9 +71,15 @@ class CategorieMongo(BaseMongo):
             # Seleziona i filtri in base a selectedDateOption
             filters = UTILS.DATE_OPTIONS_MAP[selectedDateOption]
 
+            if selectedDateOption == 'mese corrente':
+                match_query = {"$match": {"type": {"$ne" : "transfer"}, "date": {"$gte": filters['start_date']}}}
+            else:
+                match_query = {"$match": {"type": {"$ne" : "transfer"}, "date": {"$gte": filters['start_date'], "$lte": filters['end_date']}}}
+
+
             collection = self.client[user_id][VARS.TRANSACTION_COLLECTION]
             pipeline = [
-                {"$match": {"type": {"$ne" : "transfer"}, "date": {"$gte": filters['start_date'], "$lte": filters['end_date']}}},
+                match_query,
                 {
                     "$group": {
                         "_id": {

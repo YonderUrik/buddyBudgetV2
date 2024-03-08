@@ -347,7 +347,11 @@ class TransazioniMongo(BaseMongo):
             
             if selectedDateOption:
                 filtersDate = UTILS.DATE_OPTIONS_MAP[selectedDateOption]
-                converted_logic_operators["date"] = {"$gte": filtersDate['start_date'], "$lte": filtersDate['end_date']}
+                if selectedDateOption == 'mese corrente':
+                    match_query = {"$gte": filtersDate['start_date']}
+                else:
+                    match_query = {"$gte": filtersDate['start_date'], "$lte": filtersDate['end_date']}
+                converted_logic_operators["date"] = match_query
 
             nr_of_docs = mongo.count_documents(converted_logic_operators)
 

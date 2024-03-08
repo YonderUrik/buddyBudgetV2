@@ -74,9 +74,14 @@ class HomeMongo(BaseMongo):
             # Seleziona i filtri in base a selectedDateOption
             filters = UTILS.DATE_OPTIONS_MAP[selectedDateOption]
 
+            if selectedDateOption == 'mese corrente':
+                match_query = {"$match": {"type": "in", "date": {"$gte": filters['start_date']}}}
+            else:
+                match_query = {"$match": {"type": "in", "date": {"$gte": filters['start_date'], "$lte": filters['end_date']}}}
+
             # Esegui l'aggregazione per ottenere la somma del campo "amount" per i documenti di tipo "in"
             in_pipeline = [
-                {"$match": {"type": "in", "date": {"$gte": filters['start_date'], "$lte": filters['end_date']}}},
+                match_query,
                 {"$group": {"_id": None, "total_amount": {"$sum": "$amount"}}}
             ]
             in_result = list(collection.aggregate(in_pipeline))
@@ -103,10 +108,14 @@ class HomeMongo(BaseMongo):
             # Seleziona i filtri in base a selectedDateOption
             filters = UTILS.DATE_OPTIONS_MAP[selectedDateOption]
 
-            
+            if selectedDateOption == 'mese corrente':
+                match_query = {"$match": {"type": "out", "date": {"$gte": filters['start_date']}}}
+            else:
+                match_query = {"$match": {"type": "out", "date": {"$gte": filters['start_date'], "$lte": filters['end_date']}}}
+
             # Aggregazione per raggruppare per categoryId e calcolare il totale degli importi
             pipeline = [
-                {"$match": {"type": "out", "date": {"$gte": filters['start_date'], "$lte": filters['end_date']}}},
+                match_query,
                 {"$group": {"_id": "$categoryId", "totalAmount": {"$sum": "$amount"}}},  # Raggruppa per categoryId e calcola il totale degli importi
                 {"$project": {"categoryId": "$_id", "totalAmount": 1, "_id": 0}},  # Rinomina _id in categoryId e rimuovi _id dall'output
                 {"$sort": {"totalAmount": -1}}  # Ordina per totalAmount in ordine discendente (-1)
@@ -190,10 +199,14 @@ class HomeMongo(BaseMongo):
             # Seleziona i filtri in base a selectedDateOption
             filters = UTILS.DATE_OPTIONS_MAP[selectedDateOption]
             
+            if selectedDateOption == 'mese corrente':
+                match_query = {"$match": {"lastUpdate": {"$gte": filters['start_date']}}}
+            else:
+                match_query = {"$match": {"lastUpdate": {"$gte": filters['start_date'], "$lte": filters['end_date']}}}
 
             # Create an aggregation pipeline to group data by CardName and date
             pipeline = [
-                {"$match": {"lastUpdate": {"$gte": filters['start_date'], "$lte": filters['end_date']}}},
+                match_query,
                 {
                     "$sort": {
                         "cardName": 1,
