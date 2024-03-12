@@ -85,12 +85,16 @@ class HomeMongo(BaseMongo):
                 {"$group": {"_id": None, "total_amount": {"$sum": "$amount"}}}
             ]
             in_result = list(collection.aggregate(in_pipeline))
-            print(in_pipeline)
             total_in_amount = in_result[0]['total_amount'] if in_result else 0
 
             # Esegui l'aggregazione per ottenere la somma del campo "amount" per i documenti di tipo "out"
+            if selectedDateOption == 'mese corrente':
+                match_query = {"$match": {"type": "out", "date": {"$gte": filters['start_date']}}}
+            else:
+                match_query = {"$match": {"type": "out", "date": {"$gte": filters['start_date'], "$lte": filters['end_date']}}}
+                
             out_pipeline = [
-                {"$match": {"type": "out", "date": {"$gte": filters['start_date'], "$lte": filters['end_date']}}},
+                match_query,
                 {"$group": {"_id": None, "total_amount": {"$sum": "$amount"}}}
             ]
             print(out_pipeline)
