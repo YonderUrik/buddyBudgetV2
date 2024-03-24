@@ -10,12 +10,15 @@ secrets:
     external: true
   mongodb-root-password:
     external: true
+  mailtrap_token:
+    external: true
 
 services:
   backend:
     secrets:
       - mongodb-root-username
       - mongodb-root-password
+      - mailtrap_token
     image: buddy-budget:2.1.0
     ports:
       - "8317:5555"
@@ -23,6 +26,7 @@ services:
       - MONGO_HOST=mongodb:27017
       - mongodb_username=/run/secrets/mongodb-root-username
       - mongodb_password=/run/secrets/mongodb-root-password
+      - mailtrap_token=/run/secrets/mailtrap_token
     deploy:
       replicas: 5
       placement:
