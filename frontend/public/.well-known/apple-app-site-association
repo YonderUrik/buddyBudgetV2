@@ -2,9 +2,16 @@
   "applinks": {
     "details": [
       {
-        "appID": "4ZRJPT423H.net.buddybudget",
-        "paths": ["*"]
+        "appIDs": [ "4ZRJPT423H.net.buddybudget"],
+        "paths": [
+          "*"
+        ]
       }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "4ZRJPT423H.net.buddybudget"
     ]
   }
 }
