@@ -91,10 +91,7 @@ const App = props => {
     <CacheProvider value={emotionCache}>
       <Head>
         <title>{`${themeConfig.templateName}`}</title>
-        <meta
-          name='description'
-          content={`${themeConfig.templateName} – budgetting and investment app`}
-        />
+        <meta name='description' content={`${themeConfig.templateName} – budgetting and investment app`} />
         <meta name='keywords' content='BuddyBudget, Buddy, Accounting, Budgetting, Investment, Tracking' />
         <meta name='viewport' content='initial-scale=1, width=device-width' />
       </Head>

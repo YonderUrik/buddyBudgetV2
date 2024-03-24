@@ -37,3 +37,31 @@ DATE_OPTIONS_MAP = {
         'end_date': datetime(datetime.utcnow().year, 12, 31, 23, 59, 59, 999999)
     },
 }
+
+def check_password_strength(password):
+    # Regular expressions for checking password criteria
+    length_regex = re.compile(r'.{8,}')
+    uppercase_regex = re.compile(r'[A-Z]')
+    lowercase_regex = re.compile(r'[a-z]')
+    digit_regex = re.compile(r'\d')
+    special_char_regex = re.compile(r'[!@#$%^&*()\-_=+\\|[\]{};:\'",<.>/?]')
+
+    # Check if password meets all criteria
+    has_length = bool(length_regex.search(password))
+    has_uppercase = bool(uppercase_regex.search(password))
+    has_lowercase = bool(lowercase_regex.search(password))
+    has_digit = bool(digit_regex.search(password))
+    has_special_char = bool(special_char_regex.search(password))
+
+    # Return True if all criteria are met, False otherwise
+    if has_length and has_uppercase and has_lowercase and has_digit and has_special_char:
+        return password.strip()
+    
+    raise Exception("La password è troppo debole")
+
+def validate_email(email=None):
+    # Perform email validation using a simple regular expression
+    if re.match(r"[^@]+@[^@]+\.[^@]+", email.strip()):
+        return email.strip()
+    else:
+        raise Exception("Indirizzo email non valido")

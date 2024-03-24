@@ -1,6 +1,6 @@
 {
-    "name": "",
-    "short_name": "",
+    "name": "BuddyBudget",
+    "short_name": "buddybudget",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",

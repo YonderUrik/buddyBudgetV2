@@ -111,7 +111,7 @@ const LastsTransactions = props => {
             </TableRow>
           </TableHead>
           {isLoading || Object.keys(categories).length === 0 ? (
-            <>
+            <TableBody>
               {[...Array(10)].map((_, index) => (
                 <TableRow key={index}>
                   {[...Array(6)].map((_, index_under) => (
@@ -121,7 +121,7 @@ const LastsTransactions = props => {
                   ))}
                 </TableRow>
               ))}
-            </>
+            </TableBody>
           ) : (
             <TableBody>
               {dataList.map((row, index) => {

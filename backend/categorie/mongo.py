@@ -119,7 +119,6 @@ class CategorieMongo(BaseMongo):
                     }
                 }
             ]
-            print(pipeline)
 
             result = list(collection.aggregate(pipeline))
             return 200, result

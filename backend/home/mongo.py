@@ -97,7 +97,6 @@ class HomeMongo(BaseMongo):
                 match_query,
                 {"$group": {"_id": None, "total_amount": {"$sum": "$amount"}}}
             ]
-            print(out_pipeline)
             out_result = list(collection.aggregate(out_pipeline))
             total_out_amount = out_result[0]['total_amount'] if out_result else 0
 
@@ -125,8 +124,6 @@ class HomeMongo(BaseMongo):
                 {"$sort": {"totalAmount": -1}}  # Ordina per totalAmount in ordine discendente (-1)
 
             ]
-
-            print(pipeline)
 
             result = list(collection.aggregate(pipeline))
 
@@ -252,7 +249,6 @@ class HomeMongo(BaseMongo):
                     }
                 }
             ]
-            print(pipeline)
 
             result = list(collection.aggregate(pipeline))
             

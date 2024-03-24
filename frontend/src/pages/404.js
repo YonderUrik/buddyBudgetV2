@@ -43,7 +43,7 @@ const Error404 = () => {
           </Typography>
           <Typography variant='body2'>Non siamo riusciti a trovare la pagina che cercavi.</Typography>
         </BoxWrapper>
-        <Img alt='error-illustration' src='/images/pages/404-new.png' />
+        <Img alt='error-illustration' src='/images/pages/404.png' />
         <Button href='/' component={Link} variant='contained' sx={{ px: 5.5 }}>
           Torna alla home
         </Button>

@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
@@ -19,6 +19,11 @@ import { styled, useTheme } from '@mui/material/styles'
 import InputAdornment from '@mui/material/InputAdornment'
 import Typography from '@mui/material/Typography'
 import MuiFormControlLabel from '@mui/material/FormControlLabel'
+import * as yup from 'yup'
+import { useForm, Controller } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useAuth } from 'src/hooks/useAuth'
+import FormHelperText from '@mui/material/FormHelperText'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -31,6 +36,7 @@ import BlankLayout from 'src/@core/layouts/BlankLayout'
 
 // ** Hooks
 import { useSettings } from 'src/@core/hooks/useSettings'
+import { LoadingButton } from '@mui/lab'
 
 // ** Styled Components
 const RegisterIllustrationWrapper = styled(Box)(({ theme }) => ({
@@ -83,14 +89,10 @@ const FormControlLabel = styled(MuiFormControlLabel)(({ theme }) => ({
   }
 }))
 
-const LinkStyled = styled(Link)(({ theme }) => ({
-  textDecoration: 'none',
-  color: theme.palette.primary.main
-}))
-
 const Register = () => {
   // ** States
   const [showPassword, setShowPassword] = useState(false)
+  const auth = useAuth()
 
   // ** Hooks
   const theme = useTheme()
@@ -99,7 +101,48 @@ const Register = () => {
 
   // ** Vars
   const { skin } = settings
-  const imageSource = skin === 'bordered' ? 'auth-v2-register-illustration-bordered' : 'auth-v2-register-illustration'
+
+  const schema = yup.object().shape({
+    name: yup.string().required('Nome richiesto'),
+    email: yup.string().email("L'email non è del formatto corretto").required('Email richiesta'),
+    password: yup
+      .string()
+      .min(8, 'La password deve contenere almeno 8 caratteri')
+      .matches(/^(?=.*[!@#$%^&*])/, 'La password deve contenere almeno un carattere speciale [!@#$%^&*]')
+      .matches(/^(?=.*[0-9])/, 'La password deve contenere almeno un numero')
+      .matches(/^(?=.*[A-Z])/, 'La password deve contenere almeno un carattere maiuscolo')
+      .required('Password richiesta'),
+    agreement: yup.boolean().oneOf([true], 'Devi accettare le policy')
+  })
+
+  const defaultValues = {
+    password: '',
+    email: '',
+    name: '',
+    agreement: false
+  }
+
+  const {
+    control,
+    setError,
+    handleSubmit,
+    isSubmitting,
+    formState: { errors }
+  } = useForm({
+    defaultValues,
+    mode: 'onBlur',
+    resolver: yupResolver(schema)
+  })
+
+  const onSubmit = data => {
+    const { name, email, password, agreement } = data
+    auth.register({ name, email, password, agreement }, err => {
+      setError('email', {
+        type: 'manual',
+        message: err.message || err
+      })
+    })
+  }
 
   return (
     <Box className='content-right'>
@@ -108,7 +151,7 @@ const Register = () => {
           <RegisterIllustrationWrapper>
             <RegisterIllustration
               alt='register-illustration'
-              src={`/images/pages/${imageSource}-${theme.palette.mode}.png`}
+              src={`/images/pages/auth-v2-register-illustration-${theme.palette.mode}.gif`}
             />
           </RegisterIllustrationWrapper>
         </Box>
@@ -141,82 +184,125 @@ const Register = () => {
               </Typography>
             </Box>
             <Box sx={{ mb: 6 }}>
-              <TypographyStyled variant='h5'>Adventure starts here 🚀</TypographyStyled>
-              <Typography variant='body2'>Make your app management easy and fun!</Typography>
+              <TypographyStyled variant='h5'>Registrati a BuddyBudget 🚀</TypographyStyled>
             </Box>
-            <form noValidate autoComplete='off' onSubmit={e => e.preventDefault()}>
-              <TextField autoFocus fullWidth sx={{ mb: 4 }} label='Username' placeholder='johndoe' />
-              <TextField fullWidth label='Email' sx={{ mb: 4 }} placeholder='user@email.com' />
-              <FormControl fullWidth>
-                <InputLabel htmlFor='auth-login-v2-password'>Password</InputLabel>
-                <OutlinedInput
-                  label='Password'
-                  id='auth-login-v2-password'
-                  type={showPassword ? 'text' : 'password'}
-                  endAdornment={
-                    <InputAdornment position='end'>
-                      <IconButton
-                        edge='end'
-                        onMouseDown={e => e.preventDefault()}
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        <Icon icon={showPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline'} />
-                      </IconButton>
-                    </InputAdornment>
-                  }
+            <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
+              <FormControl fullWidth sx={{ mb: 4 }}>
+                <Controller
+                  name='name'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange, onBlur } }) => (
+                    <TextField
+                      autoComplete='off'
+                      label='Nome'
+                      value={value}
+                      onBlur={onBlur}
+                      onChange={onChange}
+                      error={Boolean(errors.name)}
+                    />
+                  )}
                 />
+                {errors.name && <FormHelperText sx={{ color: 'error.main' }}>{errors.name.message}</FormHelperText>}
+              </FormControl>
+              <FormControl fullWidth sx={{ mb: 4 }}>
+                <Controller
+                  name='email'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange, onBlur } }) => (
+                    <TextField
+                      autoComplete='off'
+                      label='Email'
+                      value={value}
+                      onBlur={onBlur}
+                      onChange={onChange}
+                      error={Boolean(errors.email)}
+                    />
+                  )}
+                />
+                {errors.email && <FormHelperText sx={{ color: 'error.main' }}>{errors.email.message}</FormHelperText>}
               </FormControl>
 
-              <FormControlLabel
-                control={<Checkbox />}
-                sx={{ mb: 4, mt: 1.5, '& .MuiFormControlLabel-label': { fontSize: '0.875rem' } }}
-                label={
-                  <>
-                    <Typography variant='body2' component='span'>
-                      I agree to{' '}
-                    </Typography>
-                    <LinkStyled href='/' onClick={e => e.preventDefault()}>
-                      privacy policy & terms
-                    </LinkStyled>
-                  </>
-                }
+              <FormControl fullWidth>
+                <InputLabel htmlFor='auth-login-v2-password' error={Boolean(errors.password)}>
+                  Password
+                </InputLabel>
+                <Controller
+                  name='password'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange, onBlur } }) => (
+                    <OutlinedInput
+                      value={value}
+                      onBlur={onBlur}
+                      label='Password'
+                      onChange={onChange}
+                      id='auth-login-v2-password'
+                      error={Boolean(errors.password)}
+                      type={showPassword ? 'text' : 'password'}
+                      endAdornment={
+                        <InputAdornment position='end'>
+                          <IconButton
+                            edge='end'
+                            onMouseDown={e => e.preventDefault()}
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            <Icon icon={showPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline'} fontSize={20} />
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                    />
+                  )}
+                />
+                {errors.password && (
+                  <FormHelperText sx={{ color: 'error.main' }} id=''>
+                    {errors.password.message}
+                  </FormHelperText>
+                )}
+              </FormControl>
+
+              <Controller
+                name='agreement'
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { value, onChange, onBlur } }) => (
+                  <FormControlLabel
+                    value={value}
+                    onBlur={onBlur}
+                    onChange={onChange}
+                    control={<Checkbox />}
+                    sx={{ mb: 4, mt: 1.5, '& .MuiFormControlLabel-label': { fontSize: '0.875rem' } }}
+                    label={
+                      <>
+                        <Typography variant='body2' component='span'>
+                          Accetto{' '}
+                        </Typography>
+                        <PrivacyPolicy /> & <CookiePolicy />
+                        {errors.agreement && (
+                          <FormHelperText sx={{ color: 'error.main' }}>{errors.agreement.message}</FormHelperText>
+                        )}
+                      </>
+                    }
+                  />
+                )}
               />
-              <Button fullWidth size='large' type='submit' variant='contained' sx={{ mb: 7 }}>
-                Sign up
-              </Button>
-              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-                <Typography sx={{ mr: 2, color: 'text.secondary' }}>Already have an account?</Typography>
-                <Typography href='/login' component={Link} sx={{ color: 'primary.main', textDecoration: 'none' }}>
-                  Sign in instead
-                </Typography>
-              </Box>
-              <Divider
-                sx={{
-                  '& .MuiDivider-wrapper': { px: 4 },
-                  mt: theme => `${theme.spacing(5)} !important`,
-                  mb: theme => `${theme.spacing(7.5)} !important`
-                }}
+
+              <LoadingButton
+                loading={isSubmitting}
+                fullWidth
+                size='large'
+                type='submit'
+                variant='contained'
+                sx={{ mb: 7 }}
               >
-                or
-              </Divider>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <IconButton href='/' component={Link} sx={{ color: '#497ce2' }} onClick={e => e.preventDefault()}>
-                  <Icon icon='mdi:facebook' />
-                </IconButton>
-                <IconButton href='/' component={Link} sx={{ color: '#1da1f2' }} onClick={e => e.preventDefault()}>
-                  <Icon icon='mdi:twitter' />
-                </IconButton>
-                <IconButton
-                  href='/'
-                  component={Link}
-                  onClick={e => e.preventDefault()}
-                  sx={{ color: theme => (theme.palette.mode === 'light' ? '#272727' : 'grey.300') }}
-                >
-                  <Icon icon='mdi:github' />
-                </IconButton>
-                <IconButton href='/' component={Link} sx={{ color: '#db4437' }} onClick={e => e.preventDefault()}>
-                  <Icon icon='mdi:google' />
-                </IconButton>
+                Registrati
+              </LoadingButton>
+              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <Typography sx={{ mr: 2, color: 'text.secondary' }}>Hai già un account?</Typography>
+                <Typography href='/login' component={Link} sx={{ color: 'primary.main', textDecoration: 'none' }}>
+                  Accedi
+                </Typography>
               </Box>
             </form>
           </BoxWrapper>
@@ -229,3 +315,79 @@ Register.getLayout = page => <BlankLayout>{page}</BlankLayout>
 Register.guestGuard = true
 
 export default Register
+
+export const CookiePolicy = () => {
+  useEffect(() => {
+    // Load the Iubenda script
+    const loader = () => {
+      const s = document.createElement('script')
+      const tag = document.getElementsByTagName('script')[0]
+      s.src = 'https://cdn.iubenda.com/iubenda.js'
+      tag.parentNode.insertBefore(s, tag)
+    }
+    if (window.addEventListener) {
+      window.addEventListener('load', loader, false)
+    } else if (window.attachEvent) {
+      window.attachEvent('onload', loader)
+    } else {
+      window.onload = loader
+    }
+  }, [])
+
+  const openInNewTab = url => {
+    const newWindow = window.open(url, '_blank')
+    if (newWindow) newWindow.opener = null
+  }
+
+  return (
+    <a
+      href='https://www.iubenda.com/privacy-policy/70257790/cookie-policy'
+      className='iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe'
+      title='Cookie Policy'
+      onClick={e => {
+        e.preventDefault()
+        openInNewTab(e.target.href)
+      }}
+    >
+      Cookie Policy
+    </a>
+  )
+}
+
+export const PrivacyPolicy = () => {
+  useEffect(() => {
+    // Load the Iubenda script
+    const loader = () => {
+      const s = document.createElement('script')
+      const tag = document.getElementsByTagName('script')[0]
+      s.src = 'https://cdn.iubenda.com/iubenda.js'
+      tag.parentNode.insertBefore(s, tag)
+    }
+    if (window.addEventListener) {
+      window.addEventListener('load', loader, false)
+    } else if (window.attachEvent) {
+      window.attachEvent('onload', loader)
+    } else {
+      window.onload = loader
+    }
+  }, [])
+
+  const openInNewTab = url => {
+    const newWindow = window.open(url, '_blank')
+    if (newWindow) newWindow.opener = null
+  }
+
+  return (
+    <a
+      href='https://www.iubenda.com/privacy-policy/70257790'
+      className='iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe'
+      title='Privacy Policy'
+      onClick={e => {
+        e.preventDefault()
+        openInNewTab(e.target.href)
+      }}
+    >
+      Privacy Policy
+    </a>
+  )
+}

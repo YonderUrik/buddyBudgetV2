@@ -16,7 +16,7 @@ services:
     secrets:
       - mongodb-root-username
       - mongodb-root-password
-    image: buddy-budget:2.0.0
+    image: buddy-budget:2.1.0
     ports:
       - "8317:5555"
     environment:

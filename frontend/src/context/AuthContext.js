@@ -9,6 +9,9 @@ import axios from 'src/utils/axios'
 
 // ** Config
 import authConfig from 'src/configs/auth'
+import toast from 'react-hot-toast'
+import { Capacitor } from '@capacitor/core'
+import { SavePassword } from 'capacitor-ios-autofill-save-password'
 
 // ** Defaults
 const defaultProvider = {
@@ -31,7 +34,6 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       const storedToken = document.cookie.split('; ').find(row => row.startsWith(authConfig.storageTokenKeyName + '='))
-      console.log('storedToken', storedToken)
       if (storedToken) {
         setLoading(true)
         const token = storedToken.split('=')[1]
@@ -48,17 +50,42 @@ const AuthProvider = ({ children }) => {
             document.cookie = `${authConfig.storageTokenKeyName}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`
             setUser(null)
             setLoading(false)
-            router.replace('/login')
           })
       } else {
         window.localStorage.removeItem('user')
+        setUser(null)
         setLoading(false)
-        router.replace('/login')
       }
     }
     initAuth()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const confirmRegistration = (params, errorCallback) => {
+    axios
+      .post('/auth/confirm-registration', params)
+      .then(async response => {
+        router.replace('/login')
+        toast.success('Account attivato con successo')
+      })
+      .catch(err => {
+        if (errorCallback) errorCallback(err)
+      })
+  }
+
+  const handleRegister = (params, errorCallback) => {
+    axios
+      .post('/auth/register', params)
+      .then(async response => {
+        router.replace({
+          pathname: '/verify-registration',
+          query: { email: params.email }
+        })
+      })
+      .catch(err => {
+        if (errorCallback) errorCallback(err)
+      })
+  }
 
   const handleLogin = (params, errorCallback) => {
     axios
@@ -69,6 +96,12 @@ const AuthProvider = ({ children }) => {
         window.localStorage.setItem('user', response.data.user)
         const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
         router.replace(redirectURL)
+        if (Capacitor.getPlatform() === 'ios') {
+          await SavePassword.promptDialog({
+            email: params.email,
+            password: params.password
+          })
+        }
       })
       .catch(err => {
         if (errorCallback) errorCallback(err)
@@ -94,7 +127,9 @@ const AuthProvider = ({ children }) => {
     setUser,
     setLoading,
     login: handleLogin,
-    logout: handleLogout
+    register: handleRegister,
+    logout: handleLogout,
+    confirm_registration: confirmRegistration
   }
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>

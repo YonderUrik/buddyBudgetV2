@@ -7,7 +7,11 @@ const path = require('path')
 
 module.exports = {
   trailingSlash: true,
-  reactStrictMode: false,
+  reactStrictMode: true,
+  swcMinify: true,
+  images: {
+    unoptimized: true
+  },
   webpack: config => {
     config.resolve.alias = {
       ...config.resolve.alias,

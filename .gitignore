@@ -12,6 +12,7 @@ build/
 develop-eggs/
 dist/
 downloads/
+frontend/ios/
 eggs/
 .eggs/
 lib/
@@ -152,3 +153,7 @@ cython_debug/
 #.idea/
 backend/mongodb_password
 backend/mongodb_username
+backend/mailtrap_token
+backend/banks_list.js
+backend/gmail_driver.ipynb
+/frontend/ios

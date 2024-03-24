@@ -57,8 +57,18 @@ class AuthMongo(BaseMongo):
         try:
             _id = self.client[VARS.DB_NAME][VARS.USERS_COLLECTION].insert_one(doc)
 
+            logger.info(str(_id.inserted_id))
             self.client[str(_id.inserted_id)][VARS.SETTINGS_COLLECTION].insert_one(VARS.DEFAULT_CATEGORIE)
             return 200, "success"
         except Exception as e:
             logger.error(e)
             return 500, str(e)
+        
+    def confirm_registration(self, activation_code=None):
+        try:
+            self.client[VARS.DB_NAME][VARS.USERS_COLLECTION].find_one_and_update({"confirm_code" : activation_code}, {"$set" : {"confirm_code" : None}})
+
+            return 200, "Utente attivato"
+        except Exception as e:
+            logger.error(e)
+            return 500, "Qualcosa non ha funzioanto"

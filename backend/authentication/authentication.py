@@ -11,6 +11,10 @@ from flask_jwt_extended import set_refresh_cookies
 import logging
 from authentication.mongo import AuthMongo
 import utils as UTILS
+import vars as VARS
+from datetime import datetime
+import uuid
+from email_driver import EmailDriver
 
 bp = Blueprint('authentication', __name__, url_prefix='/api/auth')
 logger = logging.getLogger(__name__)
@@ -41,6 +45,9 @@ def login():
 
         if user_details['password'] is None:
             return {"message": "Reset richiesto", "status": 300 }, 300
+        
+        if user_details['confirm_code'] != None:
+            return {"message" : "Utente non attivo"}, 400
 
         if not check_password_hash(user_details['password'], password):
             return {"message": "Credenziali errate"}, 401
@@ -63,6 +70,75 @@ def login():
     except Exception as e:
         logger.error(e)
         return {"message": "Errore interno"}, 500
+    
+@bp.route('/confirm-registration', methods=["POST"])
+def confirm_registration():
+    try:
+        mongo = AuthMongo()
+
+        request_json = dict(request.json)
+        activation_code = request_json['activation_code']
+
+        if activation_code:
+            status, msg = mongo.confirm_registration(activation_code=activation_code)
+            return {"message" : msg}, status 
+
+    except Exception as e:
+        logger.error(e)
+        return {"message" : str(e)}, 500
+    
+@bp.route('/register', methods=["POST"])
+def register():
+    try:
+        mongo = AuthMongo()
+
+        request_json = dict(request.json)
+
+        _name = str(request_json.get("name")).strip()
+        _email = UTILS.validate_email(str(request_json.get("email")))
+        _password = UTILS.check_password_strength(str(request_json.get("password")))
+        _agreement = bool(request_json.get("agreement"))
+
+        if not _agreement:
+            raise Exception("Devi accettare le policy")
+
+        _hashed_password = generate_password_hash(_password)
+
+        email_exists = mongo.get_user_by_email(email=_email)
+
+        if email_exists:
+            return {"message" : "Questa mail è già associata ad un account"}, 500
+        
+        activation_code = str(uuid.uuid4())
+
+        user_doc = {
+            "firstName" : _name,
+            "email" : _email,
+            "password" : _hashed_password,
+            "confirm_code" : activation_code,
+            "agreement" : _agreement,
+            "creation_timestamp" : datetime.utcnow(),
+            "last_login" : None,
+        }
+
+        status, msg = mongo.register_user(user_doc)
+
+        if status != 200:
+            raise Exception(msg)
+        
+        # INVIO LA MAIL
+        email_driver = EmailDriver()
+
+        html_page = VARS.REGISTRATION_EMAIL_TEMPLATE.format(activation_code=activation_code)
+        response = email_driver.send_email(recipient=_email, category="Registrazione" , subject="Conferma Registrazione", html_page=html_page)
+
+        if response['success'] == False:
+            raise Exception("Errore interno")
+        
+        return {"message" : "registrazione completate"}, 200
+    except Exception as e:
+        logger.error(e)
+        return {"message": str(e)}, 500
 
 @bp.route('/logout', methods=["POST"])
 @jwt_required()

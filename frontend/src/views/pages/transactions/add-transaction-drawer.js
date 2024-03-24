@@ -175,8 +175,6 @@ const AddTransactionDrawer = props => {
     }
   }
 
-
-
   const handleTransactionType = (event, newType) => {
     if (newType !== null) {
       reset()

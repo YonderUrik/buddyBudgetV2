@@ -9,7 +9,9 @@ const axiosInstance = axios.create({ baseURL: HOST_API, withCredentials: true })
 axiosInstance.interceptors.response.use(
   res => res,
   error =>
-    Promise.reject((error.response && error.response.data) || 'Something went wrong. Retry or contact an Administrator')
+    Promise.reject(
+      (error.response && error.response.data) || 'Qualcosa non ha funzionato. Riprova o contatta un amministratore'
+    )
 )
 
 // Add a request interceptor

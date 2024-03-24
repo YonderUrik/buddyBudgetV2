@@ -16,3 +16,24 @@ class ContiMongo(BaseMongo):
         Init ContiMongo -> Extend BaseMongo 
         """
         super(ContiMongo, self).__init__()
+
+    def does_bank_exists(self, user_id=None, cardName=None):
+        try:
+            collection = self.client[user_id][VARS.BANKS_COLLECTION]
+            result = collection.find_one({"cardName" : cardName})
+
+            if result:
+                return 200, True
+            
+            return 200, False
+        except Exception as e:
+            return 500, str(e)
+        
+    def add_bank(self, user_id=None, doc=None):
+        try:
+            collection = self.client[user_id][VARS.BANKS_COLLECTION]
+
+            collection.insert_one(doc)
+            return 200, "success"
+        except Exception as e:
+            return 500, str(e)

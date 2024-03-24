@@ -135,7 +135,7 @@ const ContiWidget = props => {
       <CardHeader
         title='Conti'
         action={
-          <Button onClick={() => router.push('/conti/aggiungi')} size='small' startIcon={<Icon icon='gg:add' />}>
+          <Button onClick={() => router.push('/conti')} size='small' startIcon={<Icon icon='gg:add' />}>
             Aggiungi
           </Button>
         }

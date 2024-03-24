@@ -356,7 +356,7 @@ class TransazioniMongo(BaseMongo):
             nr_of_docs = mongo.count_documents(converted_logic_operators)
 
             if nr_of_docs == 0:
-                return 200, pd.DataFrame(), 0
+                return 200, [], 0
 
             pipeline = []
 

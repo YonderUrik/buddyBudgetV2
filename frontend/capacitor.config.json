@@ -1,0 +1,10 @@
+{
+  "appId": "net.buddybudget",
+  "appName": "BuddyBudget",
+  "webDir": "out",
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "https://buddybudget.net",
+    "cleartext": true
+  }
+}
