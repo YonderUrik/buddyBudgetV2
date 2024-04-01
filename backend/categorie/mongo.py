@@ -69,13 +69,12 @@ class CategorieMongo(BaseMongo):
     def get_categories_statistics(self, user_id=None, selectedDateOption=None):
         try:
             # Seleziona i filtri in base a selectedDateOption
-            filters = UTILS.DATE_OPTIONS_MAP[selectedDateOption]
+            filters = UTILS.get_date_option_filter(selectedDateOption)
 
             if selectedDateOption == 'mese corrente':
                 match_query = {"$match": {"type": {"$ne" : "transfer"}, "date": {"$gte": filters['start_date']}}}
             else:
                 match_query = {"$match": {"type": {"$ne" : "transfer"}, "date": {"$gte": filters['start_date'], "$lte": filters['end_date']}}}
-
 
             collection = self.client[user_id][VARS.TRANSACTION_COLLECTION]
             pipeline = [

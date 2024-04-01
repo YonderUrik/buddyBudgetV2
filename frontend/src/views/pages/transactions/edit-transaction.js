@@ -39,7 +39,7 @@ const EditTransactionDrawer = props => {
   const [subcategories, setSintCategories] = useState([])
 
   useEffect(() => {
-    if (row.type !== 'transfer' && Object.keys(categories).length > 0) {
+    if (row.type !== 'transfer' && categories && Object.keys(categories).length > 0) {
       const subcategoriesTMP = categories[row.type].reduce((acc, category) => {
         const categoryLabel = category.category_name
         const categoryId = category.category_id

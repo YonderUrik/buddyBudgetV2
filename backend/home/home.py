@@ -22,9 +22,6 @@ logger = logging.getLogger(__name__)
 def get_income_vs_expense():
     try:
         selectedDateOption = request.json.get("selectedDateOption")
-
-        if selectedDateOption not in UTILS.DATE_OPTIONS_MAP:
-            raise Exception(f"selectedOption : {selectedDateOption} not in mapping")
         
         mongo = AuthMongo()
         _user_email = get_jwt_identity()['email']
@@ -49,9 +46,6 @@ def get_income_vs_expense():
 def get_expense_per_category():
     try:
         selectedDateOption = request.json.get("selectedDateOption")
-
-        if selectedDateOption not in UTILS.DATE_OPTIONS_MAP:
-            raise Exception(f"selectedOption : {selectedDateOption} not in mapping")
         
         mongo = AuthMongo()
         _user_email = get_jwt_identity()['email']
@@ -121,9 +115,6 @@ def get_conti_summary():
 def get_networth_by_time():
     try:
         selectedDateOption = request.json.get("selectedDateOption")
-
-        if selectedDateOption not in UTILS.DATE_OPTIONS_MAP:
-            raise Exception(f"selectedOption : {selectedDateOption} not in mapping")
         
         mongo = AuthMongo()
         _user_email = get_jwt_identity()['email']
@@ -132,6 +123,8 @@ def get_networth_by_time():
 
         mongo = HomeMongo()
         status, result, distinct_banks = mongo.get_networth_by_time(user_id=user_id, selectedDateOption=selectedDateOption)
+
+        print(status)
 
         if status == False:
             raise Exception(result)

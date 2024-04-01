@@ -12,7 +12,7 @@ import logging
 from authentication.mongo import AuthMongo
 import utils as UTILS
 import vars as VARS
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 from email_driver import EmailDriver
 
@@ -117,7 +117,7 @@ def register():
             "password" : _hashed_password,
             "confirm_code" : activation_code,
             "agreement" : _agreement,
-            "creation_timestamp" : datetime.utcnow(),
+            "creation_timestamp" : datetime.now(timezone.utc),
             "last_login" : None,
         }
 

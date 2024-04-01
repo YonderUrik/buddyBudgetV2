@@ -98,7 +98,7 @@ const TransactionTable = props => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {isLoading || Object.keys(categories).length === 0 ? (
+          {isLoading || (categories && Object.keys(categories).length === 0) ? (
             <>
               {[...Array(paginationModel.pageSize)].map((_, index) => (
                 <TableRow

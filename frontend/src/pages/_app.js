@@ -93,7 +93,7 @@ const App = props => {
         <title>{`${themeConfig.templateName}`}</title>
         <meta name='description' content={`${themeConfig.templateName} – budgetting and investment app`} />
         <meta name='keywords' content='BuddyBudget, Buddy, Accounting, Budgetting, Investment, Tracking' />
-        <meta name='viewport' content='initial-scale=1, width=device-width' />
+        <meta name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover' />
       </Head>
 
       <AuthProvider>
@@ -104,7 +104,11 @@ const App = props => {
                 return (
                   <ThemeComponent settings={settings}>
                     <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                      {getLayout(<Component {...pageProps} />)}
+                      {getLayout(
+                        <div style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+                          <Component {...pageProps} />
+                        </div>
+                      )}
                     </Guard>
                     <ReactHotToast>
                       <Toaster position={settings.toastPosition} toastOptions={{ className: 'react-hot-toast' }} />

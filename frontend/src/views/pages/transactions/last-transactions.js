@@ -110,7 +110,7 @@ const LastsTransactions = props => {
               </TableCell>
             </TableRow>
           </TableHead>
-          {isLoading || Object.keys(categories).length === 0 ? (
+          {isLoading || (categories && Object.keys(categories).length === 0) ? (
             <TableBody>
               {[...Array(10)].map((_, index) => (
                 <TableRow key={index}>

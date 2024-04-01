@@ -29,9 +29,6 @@ def get_categories_statistics():
 
         selectedDateOption = request.json.get("selectedDateOption")
 
-        if selectedDateOption not in UTILS.DATE_OPTIONS_MAP:
-            raise Exception(f"selectedOption : {selectedDateOption} not in mapping")
-
         mongo = CategorieMongo()
 
         status, transactions = mongo.get_categories_statistics(user_id=user_id, selectedDateOption=selectedDateOption)

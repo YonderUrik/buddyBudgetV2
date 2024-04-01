@@ -2,7 +2,7 @@ from mongo import BaseMongo
 import vars as VARS
 import utils as UTILS
 import logging
-from datetime import timedelta, datetime, date
+from datetime import timedelta, datetime, date, timezone
 import copy
 
 def fill_missing_data(data, distinct_banks, end_date):
@@ -72,7 +72,7 @@ class HomeMongo(BaseMongo):
             collection = self.client[user_id][VARS.TRANSACTION_COLLECTION]
 
             # Seleziona i filtri in base a selectedDateOption
-            filters = UTILS.DATE_OPTIONS_MAP[selectedDateOption]
+            filters = UTILS.get_date_option_filter(selectedDateOption)
 
             if selectedDateOption == 'mese corrente':
                 match_query = {"$match": {"type": "in", "date": {"$gte": filters['start_date']}}}
@@ -109,7 +109,7 @@ class HomeMongo(BaseMongo):
             collection = self.client[user_id][VARS.TRANSACTION_COLLECTION]
 
             # Seleziona i filtri in base a selectedDateOption
-            filters = UTILS.DATE_OPTIONS_MAP[selectedDateOption]
+            filters = UTILS.get_date_option_filter(selectedDateOption)
 
             if selectedDateOption == 'mese corrente':
                 match_query = {"$match": {"type": "out", "date": {"$gte": filters['start_date']}}}
@@ -198,12 +198,15 @@ class HomeMongo(BaseMongo):
             collection = self.client[user_id][VARS.BANKS_COLLECTION]
             
             # Seleziona i filtri in base a selectedDateOption
-            filters = UTILS.DATE_OPTIONS_MAP[selectedDateOption]
+            filters = UTILS.get_date_option_filter(selectedDateOption)
             
             if selectedDateOption == 'mese corrente':
                 match_query = {"$match": {"lastUpdate": {"$gte": filters['start_date']}}}
             else:
                 match_query = {"$match": {"lastUpdate": {"$gte": filters['start_date'], "$lte": filters['end_date']}}}
+
+
+            print(match_query)
 
             # Create an aggregation pipeline to group data by CardName and date
             pipeline = [
@@ -254,6 +257,9 @@ class HomeMongo(BaseMongo):
             
             distinct_banks = collection.distinct("cardName")
 
+            if len(result) == 0:
+                return True, result, distinct_banks
+
             formatted_results = []
 
             for result in result:
@@ -266,9 +272,8 @@ class HomeMongo(BaseMongo):
 
             filled_data = fill_missing_data(formatted_results, distinct_banks, end_date=filters['end_date'])
             return True, filled_data, distinct_banks
-
         except Exception as e:
-            return False, str(e)
+            return False, str(e), []
         
     def get_categories(self, user_id=None):
         try:

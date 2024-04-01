@@ -633,5 +633,5 @@ DEFAULT_CATEGORIE = {
       ]
     }
   ],
-  "type": "categorie-di-bilancio"
+  "type": "budgetting-categories"
 }

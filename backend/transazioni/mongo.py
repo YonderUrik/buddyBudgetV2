@@ -346,7 +346,7 @@ class TransazioniMongo(BaseMongo):
                                             ] = filters_query[key]
             
             if selectedDateOption:
-                filtersDate = UTILS.DATE_OPTIONS_MAP[selectedDateOption]
+                filtersDate = UTILS.get_date_option_filter(selectedDateOption)
                 if selectedDateOption == 'mese corrente':
                     match_query = {"$gte": filtersDate['start_date']}
                 else:

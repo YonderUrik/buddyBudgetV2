@@ -57,9 +57,6 @@ def get_transactions():
 
         selectedDateOption = request.json.get("selectedDateOption")
 
-        if selectedDateOption not in UTILS.DATE_OPTIONS_MAP:
-            raise Exception(f"selectedOption : {selectedDateOption} not in mapping")
-
         mongo = TransazioniMongo()
         status, transactions, transactions_count = mongo.get_transactions(user_id=user_id, page=page, pageSize=pageSize, sort=sort, filter=filter, selectedDateOption=selectedDateOption)
 
