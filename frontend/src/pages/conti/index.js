@@ -7,6 +7,7 @@ import axios from 'src/utils/axios'
 import { fCurrency } from 'src/utils/format-number'
 import AddNewBank from 'src/views/pages/conti/add-new-bank'
 import BankInfo from 'src/views/pages/conti/bank-info'
+import NetWorthChart from 'src/views/pages/home/networth-chart'
 
 const Conti = () => {
   const RenderTabAvatar = ({ data }) => (
@@ -120,7 +121,8 @@ const Conti = () => {
           {contoSelected === 'addBank' ? (
             <AddNewBank refreshData={refreshData} />
           ) : (
-            <BankInfo key={contoSelected} bankName={contoSelected} />
+            <NetWorthChart key={contoSelected} balanceview={true} bankName={contoSelected} hideCard={true}/>
+            // <BankInfo key={contoSelected} bankName={contoSelected} />
           )}
         </TabPanel>
       </TabContext>

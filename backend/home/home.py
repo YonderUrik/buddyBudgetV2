@@ -115,6 +115,7 @@ def get_conti_summary():
 def get_networth_by_time():
     try:
         selectedDateOption = request.json.get("selectedDateOption")
+        bankName = request.json.get("bankName", None)
         
         mongo = AuthMongo()
         _user_email = get_jwt_identity()['email']
@@ -122,9 +123,7 @@ def get_networth_by_time():
         user_id = str(user_details['_id'])
 
         mongo = HomeMongo()
-        status, result, distinct_banks = mongo.get_networth_by_time(user_id=user_id, selectedDateOption=selectedDateOption)
-
-        print(status)
+        status, result, distinct_banks = mongo.get_networth_by_time(user_id=user_id, selectedDateOption=selectedDateOption, bankName=bankName)
 
         if status == False:
             raise Exception(result)

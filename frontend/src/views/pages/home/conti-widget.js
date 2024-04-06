@@ -3,6 +3,8 @@ import Card from '@mui/material/Card'
 import { useTheme } from '@mui/material/styles'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
+import Typography from '@mui/material/Typography'
+import CircularProgress from '@mui/material/CircularProgress'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -22,15 +24,19 @@ import { useRouter } from 'next/router'
 const ContiWidget = props => {
   const { balanceview } = props
   const [conti, setConti] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const getData = useCallback(async () => {
+    setIsLoading(true)
     try {
       const response = await axio.post('/home/get-conti-summary', {})
       const { data } = response
       setConti(data)
     } catch (error) {
       toast.error(error.message || error)
+    } finally {
+      setIsLoading(false)
     }
   }, [])
 
@@ -140,14 +146,26 @@ const ContiWidget = props => {
           </Button>
         }
       />
+      {isLoading && (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 294 }}>
+          <CircularProgress />
+        </div>
+      )}
       <CardContent>
-        <ReactApexcharts
-          key={balanceview}
-          type='donut'
-          height={360}
-          options={options}
-          series={conti.map(conto => conto.balance)}
-        />
+        {!isLoading && conti.length === 0 && (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 294 }}>
+            <Typography variant='subtitle1'>Non hai aggiunto nessun conto</Typography>
+          </div>
+        )}
+        {!isLoading && conti.length > 0 && (
+          <ReactApexcharts
+            key={balanceview}
+            type='donut'
+            height={294}
+            options={options}
+            series={conti.map(conto => conto.balance)}
+          />
+        )}
       </CardContent>
     </Card>
   )

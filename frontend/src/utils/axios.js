@@ -6,14 +6,6 @@ import { HOST_API } from './config-global'
 
 const axiosInstance = axios.create({ baseURL: HOST_API, withCredentials: true })
 
-axiosInstance.interceptors.response.use(
-  res => res,
-  error =>
-    Promise.reject(
-      (error.response && error.response.data) || 'Qualcosa non ha funzionato. Riprova o contatta un amministratore'
-    )
-)
-
 // Add a request interceptor
 axiosInstance.interceptors.request.use(
   config => {
@@ -35,6 +27,20 @@ axiosInstance.interceptors.request.use(
     return config
   },
   error => Promise.reject(error)
+)
+
+// Response interceptor for API calls
+axiosInstance.interceptors.response.use(
+  response => response,
+  async error => {
+    const originalRequest = error.config
+    if (originalRequest.url !== '/auth/refresh' && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+      await axiosInstance.get('/auth/refresh')
+      return axiosInstance(originalRequest)
+    }
+    return Promise.reject((error.response && error.response.data) || 'Something went wrong')
+  }
 )
 
 function getCsrfTokenFromCookies() {

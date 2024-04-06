@@ -27,7 +27,7 @@ CORS(app, supports_credentials=True, origins=['http://localhost:3000'])
 # Set JWT Token with expires time
 jwt = JWTManager(app)
 app.config['JWT_SECRET_KEY'] = VARS.JWT_SECRET_KEY
-app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(hours=1)
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 
 

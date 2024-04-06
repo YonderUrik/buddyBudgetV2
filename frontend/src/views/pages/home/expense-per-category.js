@@ -198,12 +198,18 @@ const ExpensePerCategory = props => {
             </Button>
           </Box>
         </Box>
-        {isLoading ? (
+        {isLoading && (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 294 }}>
             <CircularProgress />
           </div>
-        ) : (
+        )}
+        {!isLoading && totalAmounts.length > 0 && (
           <ReactApexcharts key={balanceview} type='bar' height={294} series={series} options={options} />
+        )}
+        {!isLoading && totalAmounts.length === 0 && (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 294 }}>
+            <Typography variant='subtitle1'>Nessuna spesa per l'intervallo selezionato</Typography>
+          </div>
         )}
       </CardContent>
     </Card>

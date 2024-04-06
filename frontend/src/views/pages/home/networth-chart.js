@@ -69,7 +69,8 @@ const NetWorthChart = props => {
   }
 
   // ** States
-  const { balanceview } = props
+  const { balanceview, bankName, hideCard } = props
+
   const [chartData, setChartData] = useState([])
   const [distinctBanks, setDistinctBanks] = useState([])
   const [selectedDateOption, setSelectedDateOption] = useState(dateOptions[5])
@@ -80,7 +81,7 @@ const NetWorthChart = props => {
   const getData = useCallback(async () => {
     setIsLoading(true)
     try {
-      const response = await axios.post('/home/get-networth-by-time', { selectedDateOption })
+      const response = await axios.post('/home/get-networth-by-time', { selectedDateOption, bankName })
       const { data } = response
       setChartData(data[0])
       setDistinctBanks(data[1])
@@ -98,7 +99,7 @@ const NetWorthChart = props => {
   const colorScale = generateColorScale(theme.palette.primary.dark, distinctBanks.length)
 
   return (
-    <Card>
+    <Card sx={{ boxShadow: hideCard ? 0 : 6 }}>
       <CardHeader
         title={
           <Typography variant='subtitle'>
@@ -121,12 +122,18 @@ const NetWorthChart = props => {
         }}
       />
       <CardContent>
-        {isLoading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 350 }}>
+        {isLoading && (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 700 }}>
             <CircularProgress />
           </div>
-        ) : (
-          <Box sx={{ height: 350 }}>
+        )}
+        {!isLoading && chartData.length === 0 && (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 700 }}>
+            <Typography>Nessun dato per il patrimonio nel corso del tempo</Typography>
+          </div>
+        )}
+        {!isLoading && chartData.length > 0 && (
+          <Box sx={{ height: 700 }}>
             <ResponsiveContainer>
               <AreaChart height={350} data={chartData} margin={{ left: 30 }}>
                 <CartesianGrid />

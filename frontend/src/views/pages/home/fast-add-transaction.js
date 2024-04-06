@@ -44,7 +44,7 @@ const FastAddTransaction = props => {
                 <Typography variant='h5' sx={{ mb: 4.5 }}>
                   Bentornato/a{' '}
                   <Box component='span' sx={{ fontWeight: 'bold' }}>
-                    {auth.user.firstName}
+                    {auth?.user?.firstName}
                   </Box>
                 </Typography>
               </Box>

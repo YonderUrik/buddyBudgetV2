@@ -117,7 +117,7 @@ def register():
             "password" : _hashed_password,
             "confirm_code" : activation_code,
             "agreement" : _agreement,
-            "creation_timestamp" : datetime.now(timezone.utc),
+            "creation_timestamp" : datetime.utcnow(),
             "last_login" : None,
         }
 
@@ -162,8 +162,23 @@ def myaccount():
         "role" : 'client',
         "firstName" : user_details['firstName']
     }
+
     access_token = create_access_token(identity=identity)
     resp = jsonify({'refresh': True, "user": identity})
     set_access_cookies(resp, access_token)
 
     return resp, 200
+
+@bp.route('/refresh')
+@jwt_required(refresh=True)
+def refresh_jwts():
+    logger.info("Token refreshing")
+    try:
+        resp = jsonify({"success" : True})
+        access_token = create_access_token(identity=get_jwt_identity())
+        set_access_cookies(resp, access_token)
+
+        return resp, 200
+    except Exception as e:
+        logger.error(e)
+        return jsonify({"success" : False}), 500

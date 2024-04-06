@@ -1,5 +1,6 @@
 // ** React Imports
 import { createContext, useEffect, useState } from 'react'
+import Cookies from 'js-cookie'
 
 // ** Next Import
 import { useRouter } from 'next/router'
@@ -33,29 +34,26 @@ const AuthProvider = ({ children }) => {
   const router = useRouter()
   useEffect(() => {
     const initAuth = async () => {
-      const storedToken = document.cookie.split('; ').find(row => row.startsWith(authConfig.storageTokenKeyName + '='))
-      if (storedToken) {
-        setLoading(true)
-        const token = storedToken.split('=')[1]
-        await axios
-          .get(authConfig.meEndpoint, {})
-          .then(async response => {
-            setLoading(false)
-            setUser({ ...response.data.user })
-            window.localStorage.setItem('user', response.data.user)
-          })
-          .catch(() => {
-            // Handle token expiration or invalid token
-            window.localStorage.removeItem('user')
-            document.cookie = `${authConfig.storageTokenKeyName}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`
-            setUser(null)
-            setLoading(false)
-          })
-      } else {
-        window.localStorage.removeItem('user')
-        setUser(null)
-        setLoading(false)
-      }
+      setLoading(true)
+      await axios
+        .get(authConfig.meEndpoint, {})
+        .then(async response => {
+          setUser({ ...response.data.user })
+          window.localStorage.setItem('user', response.data.user)
+        })
+        .catch(() => {
+          // Handle token expiration or invalid token
+          localStorage.clear()
+          sessionStorage.clear()
+          Cookies.remove('access_token_cookie')
+          Cookies.remove('refresh_token_cookie')
+          Cookies.remove('csrf_access_token')
+          Cookies.remove('csrf_refresh_token')
+          setUser(null)
+        })
+        .finally(() => {
+          setLoading(false)
+        })
     }
     initAuth()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,16 +107,26 @@ const AuthProvider = ({ children }) => {
   }
 
   const handleLogout = () => {
-    setUser(null)
+    axios
+      .post('/auth/logout')
+      .then(async response => {
+        setUser(null)
 
-    // Remove user data from local storage
-    window.localStorage.removeItem('user')
+        // Remove user data from local storage
+        window.localStorage.clear()
+        sessionStorage.clear()
 
-    // Remove access token cookie
-    document.cookie = `${authConfig.storageTokenKeyName}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`
+        Cookies.remove('access_token_cookie')
+        Cookies.remove('refresh_token_cookie')
+        Cookies.remove('csrf_access_token')
+        Cookies.remove('csrf_refresh_token')
 
-    // Redirect to login page
-    router.push('/login')
+        // Redirect to login page
+        router.push('/login')
+      })
+      .catch(error => {
+        toast.error(error.message || error)
+      })
   }
 
   const values = {

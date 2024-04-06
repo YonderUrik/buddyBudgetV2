@@ -193,7 +193,7 @@ class HomeMongo(BaseMongo):
         except Exception as e:
             return False, str(e)
         
-    def get_networth_by_time(self, user_id=None, selectedDateOption=None):
+    def get_networth_by_time(self, user_id=None, selectedDateOption=None, bankName=None):
         try:
             collection = self.client[user_id][VARS.BANKS_COLLECTION]
             
@@ -205,8 +205,8 @@ class HomeMongo(BaseMongo):
             else:
                 match_query = {"$match": {"lastUpdate": {"$gte": filters['start_date'], "$lte": filters['end_date']}}}
 
-
-            print(match_query)
+            if bankName:
+                match_query["$match"]['cardName'] = bankName
 
             # Create an aggregation pipeline to group data by CardName and date
             pipeline = [

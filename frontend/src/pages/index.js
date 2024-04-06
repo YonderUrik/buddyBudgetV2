@@ -59,9 +59,9 @@ const Home = () => {
           <ContiWidget balanceview={balanceviewState} />
         </Box>
       </Grid>
-      <Grid item xs={12} md={12}>
+      {/* <Grid item xs={12} md={12}>
         <LastsTransactions balanceview={balanceviewState} refreshAllData={refreshAllData} />
-      </Grid>
+      </Grid> */}
       <Grid item xs={12} md={12}>
         <NetWorthChart balanceview={balanceviewState} />
       </Grid>
