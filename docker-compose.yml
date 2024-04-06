@@ -19,7 +19,7 @@ services:
       - mongodb-root-username
       - mongodb-root-password
       - mailtrap_token
-    image: buddy-budget:2.1.1
+    image: buddy-budget:2.1.2
     ports:
       - "8317:5555"
     environment:
