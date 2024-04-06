@@ -13,7 +13,11 @@ const AuthGuard = props => {
   const router = useRouter()
 
   useEffect(() => {
-    if (auth.user === null) {
+    if (!router.isReady) {
+      return
+    }
+
+    if (!auth.loading && auth.user === null) {
       if (router.asPath !== '/') {
         router.replace({
           pathname: '/login',
@@ -29,7 +33,7 @@ const AuthGuard = props => {
     //     pathname: router.asPath
     //   })
     // }
-  }, [])
+  }, [router.route, auth])
 
   if (auth.loading || !router.isReady) {
     return fallback

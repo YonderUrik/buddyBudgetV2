@@ -12,7 +12,6 @@ const GuestGuard = props => {
   const auth = useAuth()
   const router = useRouter()
 
-
   useEffect(() => {
     if (!router.isReady) {
       return
@@ -25,7 +24,7 @@ const GuestGuard = props => {
         router.replace('/')
       }
     }
-  }, [auth])
+  }, [router.route])
 
   if (auth.loading || !router.isReady) {
     return fallback
