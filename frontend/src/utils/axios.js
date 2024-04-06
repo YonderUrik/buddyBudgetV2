@@ -37,8 +37,10 @@ axiosInstance.interceptors.response.use(
     if (originalRequest.url !== '/auth/refresh' && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
       await axiosInstance.get('/auth/refresh')
+
       return axiosInstance(originalRequest)
     }
+
     return Promise.reject((error.response && error.response.data) || 'Something went wrong')
   }
 )

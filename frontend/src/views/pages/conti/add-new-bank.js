@@ -85,12 +85,7 @@ const AddNewBank = props => {
             rules={{ required: true }}
             render={({ field: { value, onChange } }) => (
               <Stack sx={{ mb: 5 }}>
-                <TextField
-                  value={value}
-                  label='Nome Banca'
-                  onChange={onChange}
-                  error={Boolean(errors.cardName)}
-                />
+                <TextField value={value} label='Nome Banca' onChange={onChange} error={Boolean(errors.cardName)} />
               </Stack>
             )}
           />

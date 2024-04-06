@@ -121,7 +121,8 @@ const Conti = () => {
           {contoSelected === 'addBank' ? (
             <AddNewBank refreshData={refreshData} />
           ) : (
-            <NetWorthChart key={contoSelected} balanceview={true} bankName={contoSelected} hideCard={true}/>
+            <NetWorthChart key={contoSelected} balanceview={true} bankName={contoSelected} hideCard={true} />
+
             // <BankInfo key={contoSelected} bankName={contoSelected} />
           )}
         </TabPanel>

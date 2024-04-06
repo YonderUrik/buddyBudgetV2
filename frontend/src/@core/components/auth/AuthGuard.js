@@ -40,6 +40,7 @@ const AuthGuard = props => {
   }
 
   return <>{children}</>
+
   // useEffect(
   //   () => {
   //     if (!router.isReady) {
