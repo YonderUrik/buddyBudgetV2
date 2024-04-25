@@ -6,8 +6,6 @@ import ExpensePerCategory from 'src/views/pages/home/expense-per-category'
 import NetWorthChart from 'src/views/pages/home/networth-chart'
 import FastAddTransaction from 'src/views/pages/home/fast-add-transaction'
 
-import LastsTransactions from 'src/views/pages/transactions/last-transactions'
-
 const Home = () => {
   const balanceview = window.localStorage.getItem('balanceView') === 'true'
   const [balanceviewState, setBalanceviewState] = useState(balanceview)
@@ -59,9 +57,6 @@ const Home = () => {
           <ContiWidget balanceview={balanceviewState} />
         </Box>
       </Grid>
-      {/* <Grid item xs={12} md={12}>
-        <LastsTransactions balanceview={balanceviewState} refreshAllData={refreshAllData} />
-      </Grid> */}
       <Grid item xs={12} md={12}>
         <NetWorthChart balanceview={balanceviewState} />
       </Grid>
