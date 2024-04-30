@@ -14,7 +14,7 @@ import ReactApexcharts from 'src/@core/components/react-apexcharts'
 
 // ** Util Import
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
-import { fCurrency } from 'src/utils/format-number'
+import { fCurrency, fShortenNumber } from 'src/utils/format-number'
 import { useCallback, useEffect, useState } from 'react'
 import axio from 'src/utils/axios'
 import toast from 'react-hot-toast'
@@ -94,9 +94,9 @@ const ContiWidget = props => {
       pie: {
         endAngle: 130,
         startAngle: -130,
-        customScale: 0.9,
+        // customScale: 0.9,
         donut: {
-          size: '81%',
+          size: '80%',
           labels: {
             show: true,
             name: {
@@ -111,7 +111,7 @@ const ContiWidget = props => {
               color: theme.palette.text.primary,
               formatter: value => {
                 if (balanceview) {
-                  return `${fCurrency(parseFloat(value))}`
+                  return `€${fShortenNumber(parseFloat(value))}`
                 }
 
                 return '******'
@@ -124,7 +124,7 @@ const ContiWidget = props => {
               color: theme.palette.text.secondary,
               formatter: value => {
                 if (balanceview) {
-                  return fCurrency(value.globals.seriesTotals.reduce((total, num) => total + num))
+                  return fShortenNumber(value.globals.seriesTotals.reduce((total, num) => total + num))
                 }
 
                 return '******'

@@ -29,9 +29,9 @@ USERS_COLLECTION = 'users'
 BANKS_COLLECTION = 'banks'
 TRANSACTION_COLLECTION = 'transactions'
 SETTINGS_COLLECTION = 'settings'
-ASSETS_TRANSACTIONS_COLLECTION = 'assets_transactions'
-ASSETS_INFO_COLLECTION = 'assets_info'
-ASSETS_HISTORICAL_DATE = 'assets_historical_date'
+STOCKS_INFO_COLLECTION = 'stocksInfo'
+STOCKS_TRANSACTION_COLLECTION = 'stocksTransactions'
+STOCKS_DATA = 'stocksData'
 
 REGISTRATION_EMAIL_TEMPLATE = """
 <!DOCTYPE html>

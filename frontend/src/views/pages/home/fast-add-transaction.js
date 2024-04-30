@@ -62,7 +62,7 @@ const FastAddTransaction = props => {
               </Box>
             </Box>
             {/* PATRIMONIO */}
-            <Typography variant='subtitle2'>
+            <Typography variant='body1'>
               Il tuo patrimonio totale è di
               <Box component='span' sx={{ fontWeight: 600 }}>
                 {' '}

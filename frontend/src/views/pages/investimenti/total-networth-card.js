@@ -1,60 +1,129 @@
-import { Box, Card, CardContent, CardHeader, Grid, Tooltip, Typography } from '@mui/material'
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
+import { Box, Card, CardContent, CardHeader, CircularProgress, Divider, Typography, useTheme } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { Area, AreaChart, CartesianGrid, Tooltip, ResponsiveContainer, XAxis, YAxis } from 'recharts'
+import IconifyIcon from 'src/@core/components/icon'
+import axiosInstance from 'src/utils/axios'
+import { fCurrency, fPercent, fShortenNumber } from 'src/utils/format-number'
+import { fDate } from 'src/utils/format-time'
+
+function calculateEarnings(currentValue, investedValue) {
+  // Calculate percentage
+  const percentage = ((currentValue - investedValue) / investedValue) * 100
+
+  // Calculate amount
+  const amount = currentValue - investedValue
+
+  return { percentage, amount }
+}
 
 const TotalNetWorthCard = () => {
+  const [data, setData] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [currentValue, setCurrentValue] = useState(0)
+  const [investedValue, setInvestedValue] = useState(0)
+  const theme = useTheme()
+
+  const { percentage, amount } = calculateEarnings(currentValue, investedValue)
+
+  const getData = async () => {
+    try {
+      setIsLoading(true)
+      const response = await axiosInstance.post('/investimenti/get-chart', {})
+      const { data } = response
+      setData(data)
+    } catch (error) {
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const getLastInfos = async () => {
+    try {
+      const response = await axiosInstance.post('/investimenti/get-last-infos', {})
+      const { data } = response
+      setCurrentValue(data[0])
+      setInvestedValue(data[1])
+    } catch (error) {}
+  }
+
+  useEffect(() => {
+    getLastInfos()
+    getData()
+  }, [])
+
+  const CustomTooltip = data => {
+    const { active, payload } = data
+    if (active && payload) {
+      return (
+        <Box sx={{ p: 2, bgcolor: 'background.paper', border: 0, borderRadius: 1 }} className='recharts-custom-tooltip'>
+          <Typography>{data.label}</Typography>
+          <Divider />
+          {data &&
+            data.payload &&
+            data.payload.map(i => {
+              return (
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', '& svg': { color: i.fill, mr: 2.5 } }}
+                  key={i.dataKey}
+                >
+                  <IconifyIcon icon='mdi:circle' fontSize='0.6rem' />
+                  <Typography variant='body2'>{`${i.dataKey} : ${fCurrency(
+                    parseFloat(i.payload[i.dataKey])
+                  )}`}</Typography>
+                </Box>
+              )
+            })}
+        </Box>
+      )
+    }
+
+    return null
+  }
+
   return (
     <Card>
-      <CardContent>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
-          <Typography variant='h6' sx={{ mr: 1.5 }}>
-            €27.9k
-          </Typography>
-          <Typography variant='subtitle2' sx={{ color: 'success.main' }}>
-            +16%
-          </Typography>
-        </Box>
-        <Typography variant='body2'>Investimenti</Typography>
+      <CardHeader
+        title={
+          <>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+              <Typography variant='h6' sx={{ mr: 1.5 }}>
+                Valore corrente: {fCurrency(currentValue)}
+              </Typography>
+              <Typography variant='subtitle2' sx={{ color: amount > 0 ? 'success.main' : 'error.main' }}>
+                {amount > 0 && '+'}
+                {fPercent(percentage)} {amount > 0 && '+'}
+                {fCurrency(amount)}
+              </Typography>
+            </Box>
+            <Typography variant='body2' sx={{ mr: 1.5 }}>
+              Valore investito: {fCurrency(investedValue)}
+            </Typography>
+          </>
+        }
+      />
 
-        <Grid item xs={12}>
-          <RechartsLineChart />
-        </Grid>
+      <CardContent>
+        {isLoading && (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 350 }}>
+            <CircularProgress />
+          </div>
+        )}
+        {!isLoading && (
+          <Box sx={{ height: 350 }}>
+            <ResponsiveContainer>
+              <AreaChart height={350} data={data}>
+                <CartesianGrid strokeDasharray='3 3' />
+                <XAxis tick={{ fontSize: 12 }} dataKey='name' tickFormatter={tick => fDate(tick)} />
+                <YAxis tick={{ fontSize: 12 }} tickFormatter={tick => fShortenNumber(tick)} />
+                <Tooltip content={CustomTooltip} />
+                <Area dataKey='Investimenti' stackId='1' stroke='1' fill={theme.palette.warning.main} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </Box>
+        )}
       </CardContent>
     </Card>
   )
 }
 
 export default TotalNetWorthCard
-
-const RechartsLineChart = () => {
-  const data = [
-    { pv: 280, name: '7/12' },
-    { pv: 200, name: '8/12' },
-    { pv: 220, name: '9/12' },
-    { pv: 180, name: '10/12' },
-    { pv: 270, name: '11/12' },
-    { pv: 250, name: '12/12' },
-    { pv: 70, name: '13/12' },
-    { pv: 90, name: '14/12' },
-    { pv: 200, name: '15/12' },
-    { pv: 150, name: '16/12' },
-    { pv: 160, name: '17/12' },
-    { pv: 100, name: '18/12' },
-    { pv: 150, name: '19/12' },
-    { pv: 100, name: '20/12' },
-    { pv: 50, name: '21/12' }
-  ]
-  return (
-    <CardContent>
-      <Box sx={{ height: 350 }}>
-        <ResponsiveContainer>
-          <LineChart height={350} data={data}>
-            <CartesianGrid />
-            <XAxis dataKey='name' />
-            <YAxis />
-            <Line dataKey='pv' stroke='#ff9f43' strokeWidth={3} />
-          </LineChart>
-        </ResponsiveContainer>
-      </Box>
-    </CardContent>
-  )
-}

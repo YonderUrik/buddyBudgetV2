@@ -9,10 +9,10 @@ const DefaultPalette = (mode, skin) => {
     if (skin === 'bordered' && mode === 'light') {
       return whiteColor
     } else if (skin === 'bordered' && mode === 'dark') {
-      return '#171717'
+      return '#212121'
     } else if (mode === 'light') {
       return '#f9fafb'
-    } else return '#212121'
+    } else return '#171717'
   }
 
   return {
@@ -20,9 +20,9 @@ const DefaultPalette = (mode, skin) => {
       dark: darkColor,
       main: mainColor,
       light: lightColor,
-      darkBg: '#212121',
+      darkBg: '#171717',
       lightBg: '#f9fafb',
-      bodyBg: mode === 'light' ? '#f9fafb' : '#212121',
+      bodyBg: mode === 'light' ? '#f9fafb' : '#171717',
       trackBg: mode === 'light' ? '#F2F2F4' : '#41435C',
       avatarBg: mode === 'light' ? '#F1F1F3' : '#3F425C',
       tooltipBg: mode === 'light' ? '#262732' : '#464A65',
@@ -79,7 +79,7 @@ const DefaultPalette = (mode, skin) => {
       600: '#757575',
       700: '#616161',
       800: '#424242',
-      900: '#212121',
+      900: '#171717',
       A100: '#f9fafb',
       A200: '#f9fafb',
       A400: '#BDBDBD',
@@ -92,7 +92,7 @@ const DefaultPalette = (mode, skin) => {
     },
     divider: `rgba(${mainColor}, 0.12)`,
     background: {
-      paper: mode === 'light' ? whiteColor : '#171717',
+      paper: mode === 'light' ? whiteColor : '#212121',
       default: defaultBgColor()
     },
     action: {
