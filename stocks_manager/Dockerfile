@@ -15,4 +15,4 @@ RUN python -m pip install -r requirements.txt
 WORKDIR /app
 ADD . /app
 
-CMD ["python", "app.py"]
+CMD ["python", "stocks_manager.py"]
