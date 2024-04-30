@@ -22,7 +22,7 @@ services:
       - mongodb-root-password
       - mailtrap_token
       - XRapidAPIKey
-    image: buddy-budget-backend:2.1.2
+    image: buddy-budget-backend:2.2.0
     ports:
       - "8317:5555"
     environment:
@@ -42,7 +42,7 @@ services:
     secrets:
       - mongodb-root-username
       - mongodb-root-password
-    image: buddy-budget-stock:2.1.2
+    image: buddy-budget-stock:2.2.0
     environment:
       - MONGO_HOST=mongodb:27017
       - mongodb_username=/run/secrets/mongodb-root-username
