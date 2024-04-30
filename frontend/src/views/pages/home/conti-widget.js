@@ -94,6 +94,7 @@ const ContiWidget = props => {
       pie: {
         endAngle: 130,
         startAngle: -130,
+
         // customScale: 0.9,
         donut: {
           size: '80%',

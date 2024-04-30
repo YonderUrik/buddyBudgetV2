@@ -91,6 +91,7 @@ const NetWorthChart = props => {
       // Merge arrays based on the 'date' key
       const mergedArray = responseInvestment.data.map(item1 => {
         const item2 = data[0].find(item => item.name === item1.name)
+
         return { ...item1, ...item2 }
       })
 

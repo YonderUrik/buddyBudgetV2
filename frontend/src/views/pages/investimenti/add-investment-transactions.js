@@ -240,6 +240,7 @@ const AddStockInfo = props => {
     fee: 0,
     note: ''
   }
+
   const schema = yup.object().shape({
     quantity: yup.number().required('Quantità richiesta').moreThan(0, 'La quantità deve essere maggiore di 0'),
     price: yup.number().required('Prezzo richiesto'),
@@ -269,6 +270,7 @@ const AddStockInfo = props => {
       toast.error(error.message || error)
     }
   }
+
   return (
     <Drawer
       anchor='right'

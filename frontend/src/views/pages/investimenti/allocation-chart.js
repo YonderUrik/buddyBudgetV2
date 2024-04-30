@@ -46,6 +46,7 @@ const AllocationChart = () => {
         } else {
           acc.push({ name: curr.type, data: curr.lastBalance })
         }
+
         return acc
       }, [])
 
@@ -60,6 +61,7 @@ const AllocationChart = () => {
     if (selectedTab === 'Tipo') {
       // Usa i nomi dei tipi come etichette se è selezionata la tab "Tipo"
       const distinctTypes = new Set(allocazioneInfo.map(info => info.type))
+
       return Array.from(distinctTypes) // Converti il Set in un array
     } else if (selectedTab === 'Posizioni') {
       // Altrimenti, usa un'etichetta generica

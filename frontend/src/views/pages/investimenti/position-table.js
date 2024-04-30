@@ -35,6 +35,7 @@ const PositionTable = () => {
     const sortedRows = [...rows].sort((a, b) => {
       if (a[criteria] < b[criteria]) return isAscending ? -1 : 1
       if (a[criteria] > b[criteria]) return isAscending ? 1 : -1
+
       return 0
     })
 
@@ -49,13 +50,13 @@ const PositionTable = () => {
       const response = await axiosInstance.post('/investimenti/get-positions-data', {})
       const { data } = response
 
-
       const isAscending = sortOrder === 'asc'
 
       // Sort the rows based on the selected column and sorting order
       const sortedRows = data.sort((a, b) => {
         if (a.lastBalance < b.lastBalance) return isAscending ? -1 : 1
         if (a.lastBalance > b.lastBalance) return isAscending ? 1 : -1
+
         return 0
       })
 
@@ -69,6 +70,7 @@ const PositionTable = () => {
   useEffect(() => {
     getRows()
   }, [])
+
   return (
     <Card>
       <TableContainer component={Paper}>
@@ -128,6 +130,7 @@ function Row(props) {
   const { row } = props
 
   const is_profit = row.lastBalance - row.totalInvested > 0
+
   return (
     <>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>

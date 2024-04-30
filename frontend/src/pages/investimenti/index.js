@@ -7,6 +7,7 @@ import TotalNetworthCard from 'src/views/pages/investimenti/total-networth-card'
 
 const Investimenti = () => {
   const [key, setKey] = useState(true)
+
   return (
     <Grid container spacing={4} className='match-height'>
       <Grid item xs={12} sm={12} md={12} justify='flex-end'>
@@ -24,4 +25,5 @@ const Investimenti = () => {
     </Grid>
   )
 }
+
 export default Investimenti
