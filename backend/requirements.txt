@@ -149,3 +149,6 @@ Werkzeug==3.0.1
 widgetsnbextension==4.0.10
 yfinance==0.2.37
 zipp==3.17.0
+uwsgi
+yfinance
+mailtrap==2.0.1
