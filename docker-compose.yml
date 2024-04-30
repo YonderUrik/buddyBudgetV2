@@ -33,3 +33,21 @@ services:
         constraints: [node.role == manager]
     networks:
       - subsidia-network
+      
+  stock_manager:
+    secrets:
+      - mongodb-root-username
+      - mongodb-root-password
+    image: buddy-budget:2.1.2
+    ports:
+      - "8317:5555"
+    environment:
+      - MONGO_HOST=mongodb:27017
+      - mongodb_username=/run/secrets/mongodb-root-username
+      - mongodb_password=/run/secrets/mongodb-root-password
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    networks:
+      - subsidia-network

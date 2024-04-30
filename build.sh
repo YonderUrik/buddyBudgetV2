@@ -7,3 +7,6 @@ sleep 5
 docker build ./backend -f backend/Dockerfile -t buddy-budget:$VERSION
 docker image push buddy-budget:$VERSION
 
+docker build ./stocks_manager -f stocks_manager/Dockerfile -t buddy-budget:$VERSION
+docker image push buddy-budget:$VERSION
+

@@ -83,6 +83,8 @@ import transazioni.transazioni as transazioni
 app.register_blueprint(transazioni.bp)
 import categorie.categorie as categorie
 app.register_blueprint(categorie.bp)
+import investimenti.investimenti as investimenti
+app.register_blueprint(investimenti.bp)
 
 if __name__ == "__main__":
     app.run(host=VARS.HOST_NAME,debug=True, port=VARS.APP_PORT)

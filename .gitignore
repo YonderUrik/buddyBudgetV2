@@ -160,3 +160,9 @@ backend/gmail_driver.ipynb
 frontend/src/utils/config-global.js
 frontend/src/utils/config-global.js
 frontend/src/utils/config-global.js
+stocks_manager/mongodb_password
+stocks_manager/mongodb_username
+stocks_manager/yfinance.cache
+backend/yfinance.cache
+*.ipynb
+*.ipynb

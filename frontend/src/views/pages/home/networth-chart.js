@@ -20,6 +20,7 @@ import { fCurrency } from 'src/utils/format-number'
 import { CircularProgress, useTheme } from '@mui/material'
 import { dateOptions } from './card-income-vs-expense'
 import DateOptionsMenu from 'src/utils/date-options'
+import { fDate } from 'src/utils/format-time'
 
 const NetWorthChart = props => {
   // Funzione per generare una scala di colori in base al colore primario e al numero di banche distinte
@@ -83,8 +84,17 @@ const NetWorthChart = props => {
     try {
       const response = await axios.post('/home/get-networth-by-time', { selectedDateOption, bankName })
       const { data } = response
-      setChartData(data[0])
       setDistinctBanks(data[1])
+
+      const responseInvestment = await axios.post('/investimenti/get-chart', { selectedDateOption })
+
+      // Merge arrays based on the 'date' key
+      const mergedArray = responseInvestment.data.map(item1 => {
+        const item2 = data[0].find(item => item.name === item1.name)
+        return { ...item1, ...item2 }
+      })
+
+      setChartData(mergedArray)
     } catch (error) {
       toast.error(error.message || error)
     } finally {
@@ -123,29 +133,27 @@ const NetWorthChart = props => {
       />
       <CardContent>
         {isLoading && (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 700 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 350 }}>
             <CircularProgress />
           </div>
         )}
         {!isLoading && chartData.length === 0 && (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 700 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 350 }}>
             <Typography>Nessun dato per il patrimonio nel corso del tempo</Typography>
           </div>
         )}
         {!isLoading && chartData.length > 0 && (
-          <Box sx={{ height: 700 }}>
+          <Box sx={{ height: 350 }}>
             <ResponsiveContainer>
-              <AreaChart height={350} data={chartData} margin={{ left: 30 }}>
-                <CartesianGrid />
-                <XAxis tick={{ fontSize: 12, fill: theme.palette.text.disabled }} dataKey='name' />
-                <YAxis
-                  tick={{ fontSize: 12, fill: theme.palette.text.disabled }}
-                  tickFormatter={!balanceview ? () => '' : fCurrency}
-                />
+              <AreaChart height={350} data={chartData} margin={{ left: 20 }}>
+                <CartesianGrid strokeDasharray='3 3' />
+                <XAxis tick={{ fontSize: 12 }} dataKey='name' tickFormatter={tick => fDate(tick)} />
+                <YAxis tick={{ fontSize: 12 }} tickFormatter={!balanceview ? () => '*' : fCurrency} />
                 <Tooltip content={CustomTooltip} />
                 {distinctBanks.map((bank, index) => (
                   <Area key={bank} dataKey={bank} stackId='1' stroke='1' fill={colorScale[index]} />
                 ))}
+                <Area dataKey='Investimenti' stackId='1' stroke='1' fill={theme.palette.warning.main} />
               </AreaChart>
             </ResponsiveContainer>
           </Box>

@@ -12,6 +12,8 @@ import logging
 import utils as UTILS
 from home.mongo import HomeMongo
 from authentication.mongo import AuthMongo
+from investimenti.mongo import InvestimentiMongo
+from investimenti.functions import get_last_investment_networth
 import json
 
 bp = Blueprint('home', __name__, url_prefix='/api/home')
@@ -57,7 +59,7 @@ def get_expense_per_category():
 
         if status == False:
             raise Exception(result)
-        
+                
         return json.dumps(result, default=str)
     except Exception as e:
         logger.error(e)
@@ -80,7 +82,14 @@ def get_total_networth():
         if status == False:
             raise Exception(result)
         
-        return json.dumps(result, default=str)
+        mongo = InvestimentiMongo()
+        transactions = mongo.get_transaction_by_type(user_id=user_id)
+        distinct_symbols = list(set(doc['symbol'] for doc in transactions))
+        historical_data = mongo.get_historical_data_by_symbol(symbols=distinct_symbols)
+
+        investment_result = get_last_investment_networth(transactions=transactions, historical_data=historical_data)
+
+        return json.dumps(result+investment_result, default=str)
     except Exception as e:
         logger.error(e)
         return {"message" : "Impossibile recuperare il valore del patrimonio"}, 500
