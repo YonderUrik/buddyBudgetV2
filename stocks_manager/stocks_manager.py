@@ -72,8 +72,7 @@ def main():
                     time.sleep(1)
             
             logger.info("Sleeping for 1hour...")
-            time.sleep(60.0 * 60 * 60)
-
+            time.sleep(60.0 * 60)
         except Exception as e:
             logger.error(e)
             logger.info("Sleeping for 10minutes...")
