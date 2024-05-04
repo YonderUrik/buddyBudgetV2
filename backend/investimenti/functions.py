@@ -181,11 +181,14 @@ def calculate_investment_networth(transactions=None, historical_data=None, selec
     giorno_corrente = prima_transazione
     contatore_quantita = {}
     while giorno_corrente <= oggi:
+        print(giorno_corrente)
         data_corrente = giorno_corrente.strftime("%Y-%m-%d")
 
         valore_totale_patrimonio = 0
         for transazione in transactions:
-            if transazione["date"].replace(hour=0, minute=0, second=0) == giorno_corrente:
+            if transazione["date"].replace(hour=0, minute=0, second=0, microsecond=0) == giorno_corrente:
+                print("transazione presente")
+                
                 if transazione["symbol"] not in contatore_quantita:
                     contatore_quantita[transazione["symbol"]] = transazione["quantity"]
                 else:
