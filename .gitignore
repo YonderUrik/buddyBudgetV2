@@ -166,3 +166,4 @@ stocks_manager/yfinance.cache
 backend/yfinance.cache
 *.ipynb
 *.ipynb
+backend/XRapidAPIKey
