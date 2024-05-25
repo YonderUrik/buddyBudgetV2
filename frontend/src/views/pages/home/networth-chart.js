@@ -95,11 +95,11 @@ const NetWorthChart = props => {
           return { ...item1, ...item2 }
         })
         setChartData(mergedArray)
-      }else{
+      } else {
         setChartData(data[0])
       }
-      // Merge arrays based on the 'date' key
 
+      // Merge arrays based on the 'date' key
     } catch (error) {
       toast.error(error.message || error)
     } finally {
