@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 import { HOST_API } from './config-global'
+import { useRouter } from 'next/router'
 
 // ----------------------------------------------------------------------
 
@@ -36,12 +37,17 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config
     if (originalRequest.url !== '/auth/refresh' && error?.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
-      await axiosInstance.get('/auth/refresh')
+      try {
+        await axiosInstance.get('/auth/refresh')
 
-      return axiosInstance(originalRequest)
+        return axiosInstance(originalRequest)
+      } catch (error) {
+        const router = useRouter()
+        router.replace('/login')
+      }
     }
 
-    return Promise.reject((error.response && error.response.data) || 'Something went wrong')
+    return Promise.reject((error.response && error.response.data) || 'Qualcosa non ha funzionato')
   }
 )
 

@@ -16,7 +16,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import Icon from 'src/@core/components/icon'
 import axios from 'src/utils/axios'
 import toast from 'react-hot-toast'
-import { fCurrency } from 'src/utils/format-number'
+import { fCurrency, fShortenNumber } from 'src/utils/format-number'
 import { CircularProgress, useTheme } from '@mui/material'
 import { dateOptions } from './card-income-vs-expense'
 import DateOptionsMenu from 'src/utils/date-options'
@@ -70,7 +70,7 @@ const NetWorthChart = props => {
   }
 
   // ** States
-  const { balanceview, bankName, hideCard } = props
+  const { balanceview, bankName, hideCard, onlyBanks } = props
 
   const [chartData, setChartData] = useState([])
   const [distinctBanks, setDistinctBanks] = useState([])
@@ -88,14 +88,18 @@ const NetWorthChart = props => {
 
       const responseInvestment = await axios.post('/investimenti/get-chart', { selectedDateOption })
 
+      if (!onlyBanks) {
+        const mergedArray = responseInvestment.data.map(item1 => {
+          const item2 = data[0].find(item => item.name === item1.name)
+
+          return { ...item1, ...item2 }
+        })
+        setChartData(mergedArray)
+      }else{
+        setChartData(data[0])
+      }
       // Merge arrays based on the 'date' key
-      const mergedArray = responseInvestment.data.map(item1 => {
-        const item2 = data[0].find(item => item.name === item1.name)
 
-        return { ...item1, ...item2 }
-      })
-
-      setChartData(mergedArray)
     } catch (error) {
       toast.error(error.message || error)
     } finally {
@@ -146,10 +150,10 @@ const NetWorthChart = props => {
         {!isLoading && chartData.length > 0 && (
           <Box sx={{ height: 350 }}>
             <ResponsiveContainer>
-              <AreaChart height={350} data={chartData} margin={{ left: 20 }}>
+              <AreaChart height={350} data={chartData}>
                 <CartesianGrid strokeDasharray='3 3' />
                 <XAxis tick={{ fontSize: 12 }} dataKey='name' tickFormatter={tick => fDate(tick)} />
-                <YAxis tick={{ fontSize: 12 }} tickFormatter={!balanceview ? () => '*' : fCurrency} />
+                <YAxis tick={{ fontSize: 12 }} tickFormatter={!balanceview ? () => '*' : fShortenNumber} />
                 <Tooltip content={CustomTooltip} />
                 {distinctBanks.map((bank, index) => (
                   <Area key={bank} dataKey={bank} stackId='1' stroke='1' fill={colorScale[index]} />

@@ -27,12 +27,6 @@ const AuthGuard = props => {
         router.replace('/login')
       }
     }
-
-    // if (router.asPath !== '/') {
-    //   router.replace({
-    //     pathname: router.asPath
-    //   })
-    // }
   }, [router.route, auth])
 
   if (auth.loading || !router.isReady) {
@@ -40,32 +34,6 @@ const AuthGuard = props => {
   }
 
   return <>{children}</>
-
-  // useEffect(
-  //   () => {
-  //     if (!router.isReady) {
-  //       return
-  //     }
-
-  //     if (auth.user === null) {
-  //       if (router.asPath !== '/') {
-  //         router.replace({
-  //           pathname: '/login',
-  //           query: { returnUrl: router.asPath }
-  //         })
-  //       } else {
-  //         router.replace('/login')
-  //       }
-  //     }
-  //   },
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [router.route]
-  // )
-  // if (auth.loading) {
-  //   return fallback
-  // }
-
-  // return <>{children}</>
 }
 
 export default AuthGuard

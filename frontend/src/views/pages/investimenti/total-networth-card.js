@@ -1,10 +1,12 @@
 import { Box, Card, CardContent, CardHeader, CircularProgress, Divider, Typography, useTheme } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Area, AreaChart, CartesianGrid, Tooltip, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 import IconifyIcon from 'src/@core/components/icon'
 import axiosInstance from 'src/utils/axios'
 import { fCurrency, fPercent, fShortenNumber } from 'src/utils/format-number'
 import { fDate } from 'src/utils/format-time'
+import { dateOptions } from '../home/card-income-vs-expense'
+import DateOptionsMenu from 'src/utils/date-options'
 
 function calculateEarnings(currentValue, investedValue) {
   // Calculate percentage
@@ -22,24 +24,25 @@ const TotalNetWorthCard = () => {
   const [currentValue, setCurrentValue] = useState(0)
   const [investedValue, setInvestedValue] = useState(0)
   const theme = useTheme()
+  const [selectedDateOption, setSelectedDateOption] = useState(dateOptions[0])
 
   const { percentage, amount } = calculateEarnings(currentValue, investedValue)
 
-  const getData = async () => {
+  const getData = useCallback(async () => {
     try {
       setIsLoading(true)
-      const response = await axiosInstance.post('/investimenti/get-chart', {})
+      const response = await axiosInstance.post('/investimenti/get-chart', { selectedDateOption })
       const { data } = response
       setData(data)
     } catch (error) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [selectedDateOption])
 
   const getLastInfos = async () => {
     try {
-      const response = await axiosInstance.post('/investimenti/get-last-infos', {})
+      const response = await axiosInstance.post('/investimenti/get-last-infos', { selectedDateOption })
       const { data } = response
       setCurrentValue(data[0])
       setInvestedValue(data[1])
@@ -49,7 +52,7 @@ const TotalNetWorthCard = () => {
   useEffect(() => {
     getLastInfos()
     getData()
-  }, [])
+  }, [selectedDateOption])
 
   const CustomTooltip = data => {
     const { active, payload } = data
@@ -85,15 +88,23 @@ const TotalNetWorthCard = () => {
       <CardHeader
         title={
           <>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
-              <Typography variant='h6' sx={{ mr: 1.5 }}>
-                Valore corrente: {fCurrency(currentValue)}
-              </Typography>
-              <Typography variant='subtitle2' sx={{ color: amount > 0 ? 'success.main' : 'error.main' }}>
-                {amount > 0 && '+'}
-                {fPercent(percentage)} {amount > 0 && '+'}
-                {fCurrency(amount)}
-              </Typography>
+            <Box sx={{ mb: 2, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+                <Typography variant='h6' sx={{ mr: 1.5 }}>
+                  Valore corrente: {fCurrency(currentValue)}
+                </Typography>
+                <Typography variant='subtitle2' sx={{ color: amount > 0 ? 'success.main' : 'error.main' }}>
+                  {amount > 0 && '+'}
+                  {fPercent(percentage)} {amount > 0 && '+'}
+                  {fCurrency(amount)}
+                </Typography>
+              </Box>
+              <DateOptionsMenu
+                iconProps={{ fontSize: 24 }}
+                options={dateOptions}
+                onChangeOption={option => setSelectedDateOption(option)}
+                iconButtonProps={{ size: 'small', className: 'card-more-options', sx: { color: 'text.secondary' } }}
+              />
             </Box>
             <Typography variant='body2' sx={{ mr: 1.5 }}>
               Valore investito: {fCurrency(investedValue)}

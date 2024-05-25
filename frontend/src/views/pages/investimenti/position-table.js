@@ -114,8 +114,8 @@ const PositionTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map(row => (
-              <Row key={row.name} row={row} />
+            {rows.map((row, index) => (
+              <Row key={index} row={row} />
             ))}
           </TableBody>
         </Table>

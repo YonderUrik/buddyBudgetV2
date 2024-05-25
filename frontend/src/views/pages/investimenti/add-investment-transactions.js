@@ -157,11 +157,11 @@ const AddInvestmentTransaction = props => {
           </form>
           <List>
             {ownQuotes.length > 0 && (
-              <Accordion sx={{ bgcolor: 'background.default', boxShadow: 0, mb: 3 }} defaultExpanded>
+              <Accordion sx={{ bgcolor: 'background.default', boxShadow: 0, mb: 3 }}>
                 <AccordionSummary expandIcon={<GridExpandMoreIcon />}>
                   <Typography variant='body1' sx={{ mb: 1 }}>
                     <Stack direction='row' alignItems='center'>
-                      Le tue posizioni
+                      Le tue posizioni ({ownQuotes.length})
                     </Stack>
                   </Typography>
                 </AccordionSummary>
@@ -185,29 +185,30 @@ const AddInvestmentTransaction = props => {
                 </AccordionDetails>
               </Accordion>
             )}
-            {quotes.length > 0 && (
+            {quotes && quotes.length > 0 && (
               <Typography variant='body1' sx={{ mb: 1 }}>
                 <Stack direction='row' alignItems='center'>
                   Risultati trovati
                 </Stack>
               </Typography>
             )}
-            {quotes.map(quote => (
-              <ListItem
-                sx={{ border: 1, borderRadius: 1, borderColor: 'text.disabled', mb: 2 }}
-                key={quote.symbol}
-                secondaryAction={
-                  <IconButton onClick={() => setSelectedStock(quote)} edge='end' aria-label='delete'>
-                    <IconifyIcon icon='ic:outline-keyboard-arrow-right' />
-                  </IconButton>
-                }
-              >
-                <ListItemText
-                  primary={`${quote?.longname || quote?.shortname}`}
-                  secondary={`${quote?.symbol} - ${quote?.quoteType} - ${quote?.exchDisp}`}
-                />
-              </ListItem>
-            ))}
+            {quotes &&
+              quotes.map(quote => (
+                <ListItem
+                  sx={{ border: 1, borderRadius: 1, borderColor: 'text.disabled', mb: 2 }}
+                  key={quote.symbol}
+                  secondaryAction={
+                    <IconButton onClick={() => setSelectedStock(quote)} edge='end' aria-label='delete'>
+                      <IconifyIcon icon='ic:outline-keyboard-arrow-right' />
+                    </IconButton>
+                  }
+                >
+                  <ListItemText
+                    primary={`${quote?.longname || quote?.shortname}`}
+                    secondary={`${quote?.symbol} - ${quote?.quoteType} - ${quote?.exchDisp}`}
+                  />
+                </ListItem>
+              ))}
           </List>
         </Box>
       </Drawer>

@@ -155,6 +155,7 @@ def get_chart():
 def get_last_infos():
     try:
         mongo = AuthMongo()
+        selectedDateOption = request.json.get("selectedDateOption", None)
         _user_email = get_jwt_identity()['email']
         user_details = mongo.get_user_by_email(_user_email)
         user_id = str(user_details['_id'])
@@ -164,7 +165,7 @@ def get_last_infos():
         distinct_symbols = list(set(doc['symbol'] for doc in transactions))
         historical_data = mongo.get_historical_data_by_symbol(symbols=distinct_symbols)
 
-        last_investment_networth = FUNC.get_last_investment_networth(transactions=transactions, historical_data=historical_data)
+        last_investment_networth = FUNC.get_last_investment_networth(transactions=transactions, historical_data=historical_data, selectedDateOption=selectedDateOption)
         total_invested = 0
 
         # Itera attraverso la lista di dizionari e somma i valori della chiave 'total'

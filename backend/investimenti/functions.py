@@ -136,7 +136,7 @@ def get_allocazione(transactions=None, historical_data=None, stocks_info=None):
     return document_to_return
 
 # TODO : inserire ancora le transazioni di tipo sell e earn
-def get_last_investment_networth(transactions=None, historical_data=None):
+def get_last_investment_networth(transactions=None, historical_data=None, selectedDateOption=None):
     dati_storici_dict = {record["date_symbol"]: record["Close"] for record in historical_data}
     prima_transazione = transactions[0]["date"].replace(hour=0, minute=0, second=0)
 
@@ -181,13 +181,11 @@ def calculate_investment_networth(transactions=None, historical_data=None, selec
     giorno_corrente = prima_transazione
     contatore_quantita = {}
     while giorno_corrente <= oggi:
-        print(giorno_corrente)
         data_corrente = giorno_corrente.strftime("%Y-%m-%d")
 
         valore_totale_patrimonio = 0
         for transazione in transactions:
             if transazione["date"].replace(hour=0, minute=0, second=0, microsecond=0) == giorno_corrente:
-                print("transazione presente")
                 
                 if transazione["symbol"] not in contatore_quantita:
                     contatore_quantita[transazione["symbol"]] = transazione["quantity"]
