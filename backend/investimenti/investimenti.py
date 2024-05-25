@@ -41,6 +41,9 @@ def search():
 
         querystring = {"q":symbol}
 
+        print(VARS.XRapidAPIKey)
+        print(str(VARS.XRapidAPIKey))
+
         headers = {
             "X-RapidAPI-Key": VARS.XRapidAPIKey,
             "X-RapidAPI-Host": "apidojo-yahoo-finance-v1.p.rapidapi.com"
