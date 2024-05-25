@@ -18,7 +18,11 @@ APP_PORT = int(os.getenv("APP_PORT", 5000))
 
 mongodb_username = os.getenv("mongodb_username", "change-me")
 mongodb_password = os.getenv("mongodb_password", "change-me")
-XRapidAPIKey = str(open(os.getenv("XRapidAPIKey", "change-me"), 'r').read())
+XRapidAPIKey = os.getenv("XRapidAPIKey", "change-me")
+XRapidAPIKey = open(XRapidAPIKey, 'r').read().strip()
+
+print(XRapidAPIKey)
+print(str(XRapidAPIKey))
 
 mailtrap_token = os.getenv("mailtrap_token" , None)
 
