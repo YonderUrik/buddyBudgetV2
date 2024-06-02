@@ -3,11 +3,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 try:
-    JWT_SECRET_KEY = open(os.environ.get('JWT_SECRET_KEY')).read()
-except Exception:
-    JWT_SECRET_KEY = 'change-me'
-
-try:
     HOST_NAME = os.getenv("HOST_NAME")
 except:
     HOST_NAME = '0.0.0.0'
@@ -18,100 +13,22 @@ APP_PORT = int(os.getenv("APP_PORT", 5000))
 
 mongodb_username = os.getenv("mongodb_username", "change-me")
 mongodb_password = os.getenv("mongodb_password", "change-me")
-XRapidAPIKey = os.getenv("XRapidAPIKey", "change-me")
-XRapidAPIKey = open(XRapidAPIKey, 'r').read().strip()
+XRapidAPIKey = str(os.getenv("XRapidAPIKey", "change-me")).strip()
 
-print(XRapidAPIKey)
-print(str(XRapidAPIKey))
+# AUTH0
+AUTH0_AUDIENCE=os.getenv("AUTH0_AUDIENCE")
+DOMAIN=os.getenv("DOMAIN")
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
-mailtrap_token = os.getenv("mailtrap_token" , None)
-
+# MONGO
 DB_NAME = 'budget-tracker'
-USERS_COLLECTION = 'users'
-
-# DB of every user is identified by his _id
 BANKS_COLLECTION = 'banks'
 TRANSACTION_COLLECTION = 'transactions'
 SETTINGS_COLLECTION = 'settings'
 STOCKS_INFO_COLLECTION = 'stocksInfo'
 STOCKS_TRANSACTION_COLLECTION = 'stocksTransactions'
 STOCKS_DATA = 'stocksData'
-
-REGISTRATION_EMAIL_TEMPLATE = """
-<!DOCTYPE html>
-<html lang="it">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Conferma Registrazione</title>
-  <style>
-    body {{
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      background-color: #f5f5f5;
-      margin: 0;
-      padding: 0;
-    }}
-    .container {{
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }}
-    h1, h2, h3, h4, h5, h6 {{
-      margin-top: 0;
-    }}
-    p {{
-      margin-bottom: 20px;
-    }}
-    .button {{
-      display: inline-block;
-      padding: 10px 20px;
-      background-color: #1746A2;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }}
-    .button:hover {{
-      background-color: #0f3260;
-    }}
-    .footer {{
-      margin-top: 30px;
-      text-align: center;
-      color: #888;
-    }}
-    .header {{
-      text-align: center;
-      margin-bottom: 30px;
-    }}
-    .logo {{
-      max-width: 100px;
-      height: auto;
-    }}
-  </style>
-</head>
-<body>
-  <div class="header">
-    <img src="https://buddybudget.net/images/android-chrome-512x512.png" alt="BuddyBudgetLogo" class="logo">
-  </div>
-  <div class="container">
-    <h2>Benvenuto su Buddy Budget</h2>
-    <p>Grazie per aver registrato un account con noi.</p>
-    <p>Per completare la registrazione, clicca sul pulsante qui sotto:</p>
-    <form action="https://buddybudget.net/confirm-registration/{activation_code}">
-      <button type="submit" class="button">Completa la Registrazione</button>
-    </form>
-    <p>Se non hai richiesto questa registrazione, puoi ignorare questa email.</p>
-  </div>
-  <div class="footer">
-    <p>Questa email ti è stata inviata automaticamente. Per favore, non rispondere a questa email.</p>
-  </div>
-</body>
-</html>
-"""
 
 DEFAULT_CATEGORIE = {
   "out": [

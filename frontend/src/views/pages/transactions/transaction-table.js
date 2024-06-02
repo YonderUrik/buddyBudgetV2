@@ -13,20 +13,28 @@ import {
 } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import axios from 'src/utils/axios'
 import DeleteTransaction from './delete-transaction'
 import EditTransactionDrawer from './edit-transaction'
 import { fDate } from 'src/utils/format-time'
 import { fCurrency } from 'src/utils/format-number'
+import axiosInstance from 'src/utils/axios'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const TransactionTable = props => {
   const { paginationModel, setPaginationModel, getDataList, isLoading, dataList, dataCount } = props
 
+  const auth = useAuth0()
   const [categories, setCategories] = useState([])
 
   const getCategories = useCallback(async () => {
     try {
-      const response = await axios.get('/home/get-categories')
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.get('/home/get-categories', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
       const { data } = response
       setCategories(data)
     } catch (error) {

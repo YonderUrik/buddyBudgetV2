@@ -5,11 +5,12 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 
 // ** Hooks Import
-import { useAuth } from 'src/hooks/useAuth'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const AuthGuard = props => {
   const { children, fallback } = props
-  const auth = useAuth()
+  const auth = useAuth0()
+
   const router = useRouter()
 
   useEffect(() => {
@@ -17,7 +18,7 @@ const AuthGuard = props => {
       return
     }
 
-    if (!auth.loading && auth.user === null) {
+    if (!auth.isLoading && !auth.isAuthenticated) {
       if (router.asPath !== '/') {
         router.replace({
           pathname: '/login',
@@ -29,7 +30,7 @@ const AuthGuard = props => {
     }
   }, [router.route, auth])
 
-  if (auth.loading || !router.isReady) {
+  if (auth.isLoading || !router.isReady) {
     return fallback
   }
 

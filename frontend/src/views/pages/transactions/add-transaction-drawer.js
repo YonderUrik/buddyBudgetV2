@@ -22,8 +22,9 @@ import { useForm, Controller } from 'react-hook-form'
 import Icon from 'src/@core/components/icon'
 import { Autocomplete, CircularProgress, Stack, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import toast from 'react-hot-toast'
-import axios from 'src/utils/axios'
 import { LoadingButton } from '@mui/lab'
+import axiosInstance from 'src/utils/axios'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const Header = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -64,6 +65,8 @@ const AddTransactionDrawer = props => {
 
   const [schema, setSchema] = useState(yup.object().shape())
   const [defaultValues, setDefaultSchema] = useState({})
+
+  const auth = useAuth0()
 
   const {
     reset,
@@ -133,7 +136,17 @@ const AddTransactionDrawer = props => {
   const getContiSummary = useCallback(async () => {
     setIsLoading(true)
     try {
-      const response = await axios.post('/home/get-conti-summary', {})
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.post(
+        '/home/get-conti-summary',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       const { data } = response
       setContiList(data.map(conto => conto._id))
       reset()
@@ -148,7 +161,13 @@ const AddTransactionDrawer = props => {
   const getCategories = useCallback(async () => {
     setIsLoading(true)
     try {
-      const response = await axios.get('/home/get-categories', {})
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.get('/home/get-categories', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
       const { data } = response
       setCategories(data)
     } catch (error) {
@@ -166,7 +185,12 @@ const AddTransactionDrawer = props => {
 
   const onSubmit = async data => {
     try {
-      await axios.post('/transazioni/add-transaction', data)
+      const token = await auth.getAccessTokenSilently()
+      await axiosInstance.post('/transazioni/add-transaction', data, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
       toast.success('Transazione aggiunta')
       reset()
       refreshAllData()

@@ -1,6 +1,6 @@
 // ** Next Imports
 import Head from 'next/head'
-import { Router } from 'next/router'
+import { Router, useRouter } from 'next/router'
 
 // ** Loader Import
 import NProgress from 'nprogress'
@@ -16,6 +16,7 @@ import themeConfig from 'src/configs/themeConfig'
 
 // ** Third Party Import
 import { Toaster } from 'react-hot-toast'
+import { Auth0Provider } from '@auth0/auth0-react'
 
 // ** Component Imports
 import UserLayout from 'src/layouts/UserLayout'
@@ -27,7 +28,6 @@ import GuestGuard from 'src/@core/components/auth/GuestGuard'
 import Spinner from 'src/@core/components/spinner'
 
 // ** Contexts
-import { AuthProvider } from 'src/context/AuthContext'
 import { SettingsConsumer, SettingsProvider } from 'src/@core/context/settingsContext'
 
 // ** Styled Components
@@ -48,6 +48,7 @@ import 'src/iconify-bundle/icons-bundle-react'
 
 // ** Global css styles
 import '../../styles/globals.css'
+import { useEffect, useState } from 'react'
 
 const clientSideEmotionCache = createEmotionCache()
 
@@ -87,6 +88,12 @@ const App = props => {
   const authGuard = Component.authGuard ?? true
   const guestGuard = Component.guestGuard ?? false
 
+  const router = useRouter()
+
+  const onRedirectCallback = appState => {
+    router.push(appState?.returnTo || '/')
+  }
+
   return (
     <CacheProvider value={emotionCache}>
       <Head>
@@ -95,8 +102,15 @@ const App = props => {
         <meta name='keywords' content='BuddyBudget, Buddy, Accounting, Budgetting, Investment, Tracking' />
         <meta name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover' />
       </Head>
-
-      <AuthProvider>
+      <Auth0Provider
+        domain={process.env.NEXT_PUBLIC_DOMAIN}
+        clientId={process.env.NEXT_PUBLIC_CLIENT_ID}
+        authorizationParams={{
+          redirect_uri: process.env.NEXT_PUBLIC_HOST_NAME,
+          audience: process.env.NEXT_PUBLIC_AUDIENCE
+        }}
+        onRedirectCallback={onRedirectCallback}
+      >
         <MuiLocalizationProvider dateAdapter={AdapterDateFns}>
           <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
             <SettingsConsumer>
@@ -119,7 +133,7 @@ const App = props => {
             </SettingsConsumer>
           </SettingsProvider>
         </MuiLocalizationProvider>
-      </AuthProvider>
+      </Auth0Provider>
     </CacheProvider>
   )
 }

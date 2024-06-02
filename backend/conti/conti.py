@@ -1,31 +1,18 @@
-from flask import request, Blueprint, jsonify
-from werkzeug.security import check_password_hash
-from werkzeug.security import generate_password_hash
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import jwt_required
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import set_access_cookies
-from flask_jwt_extended import unset_jwt_cookies
-from flask_jwt_extended import create_refresh_token
-from flask_jwt_extended import set_refresh_cookies
+from flask import request, Blueprint
 import logging
-import utils as UTILS
 from conti.mongo import ContiMongo
-from authentication.mongo import AuthMongo
-import json
 from datetime import datetime
+from authentication.authentication import require_auth
+from authlib.integrations.flask_oauth2 import current_token
 
 bp = Blueprint('conti', __name__, url_prefix='/api/conti')
 logger = logging.getLogger(__name__)
 
 @bp.route('/add-conto', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def add_conto():
     try:
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         request_data = dict(request.json)
 

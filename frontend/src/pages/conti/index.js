@@ -1,9 +1,12 @@
+import { useAuth0 } from '@auth0/auth0-react'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import { Avatar, Box, Card, CardHeader, Tab, Typography } from '@mui/material'
+import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import Icon from 'src/@core/components/icon'
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
-import axios from 'src/utils/axios'
+import axiosInstance from 'src/utils/axios'
 import { fCurrency } from 'src/utils/format-number'
 import AddNewBank from 'src/views/pages/conti/add-new-bank'
 import BankInfo from 'src/views/pages/conti/bank-info'
@@ -40,18 +43,34 @@ const Conti = () => {
     setcontoSelected(newValue)
   }
 
-  const getContiSummary = useCallback(async () => {
-    const response = await axios.post('/home/get-conti-summary', {})
-    const { data } = response
-    setContiList(data)
-    if (data.length > 0) {
-      setcontoSelected(data[0]._id)
+  const auth = useAuth0()
+
+  const getContiSummary = async () => {
+    try {
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.post(
+        '/home/get-conti-summary',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+      const { data } = response
+      setContiList(data)
+      if (data.length > 0) {
+        setcontoSelected(data[0]._id)
+      }
+    } catch (error) {
+      toast.error(error.message || error)
     }
-  }, [])
+  }
 
   useEffect(() => {
     getContiSummary()
-  }, [getContiSummary])
+  }, [])
 
   const refreshData = () => {
     getContiSummary()
@@ -119,7 +138,7 @@ const Conti = () => {
         </TabList>
         <TabPanel sx={{ p: 0, mb: 2.5 }} value={contoSelected}>
           {contoSelected === 'addBank' ? (
-            <AddNewBank refreshData={refreshData} />
+            <AddNewBank refreshData={() => refreshData()} />
           ) : (
             <NetWorthChart
               key={contoSelected}

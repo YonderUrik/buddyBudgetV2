@@ -10,6 +10,7 @@ import requests_cache
 import yfinance as yf
 from datetime import datetime, timedelta
 import vars as VARS
+import functions as FUNC
 
 # Set logging parameters like format, dateformat location etc..
 logging.basicConfig(
@@ -37,12 +38,14 @@ def main():
         try:
             logger.info("START")
             # Get-lists of users
-            users_list = mongo.get_users_list()
+
+            token = FUNC.get_access_token(VARS.auth0_domain, VARS.client_id, VARS.client_secret, VARS.audience)
+            users_list = FUNC.fetch_users(VARS.auth0_domain, token)
             logger.info(f"Number of users found : {len(users_list)}")
 
             df = pd.DataFrame()
             for user in users_list:
-                id = str(user['_id'])
+                id = str(user['user_id']).replace(".", "")
                 stock_info = mongo.get_stocksInfo(user_id=id)
                 
                 if stock_info:

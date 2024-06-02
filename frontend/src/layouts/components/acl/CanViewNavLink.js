@@ -1,12 +1,12 @@
 // src/layouts/components/acl/CanViewNavLink.js
-import { useAuth } from 'src/hooks/useAuth'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const CanViewNavLink = props => {
   const { children, navLink } = props
 
-  const auth = useAuth()
+  const auth = useAuth0()
 
-  if (auth.user || (navLink && navLink.auth === false)) {
+  if (auth.isAuthenticated || (navLink && navLink.auth === false)) {
     return <>{children}</>
   } else {
     return null

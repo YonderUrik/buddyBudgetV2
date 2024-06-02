@@ -14,13 +14,14 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
-import axios from 'src/utils/axios'
 import toast from 'react-hot-toast'
 import { fCurrency, fShortenNumber } from 'src/utils/format-number'
 import { CircularProgress, useTheme } from '@mui/material'
 import { dateOptions } from './card-income-vs-expense'
 import DateOptionsMenu from 'src/utils/date-options'
 import { fDate } from 'src/utils/format-time'
+import axiosInstance from 'src/utils/axios'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const NetWorthChart = props => {
   // Funzione per generare una scala di colori in base al colore primario e al numero di banche distinte
@@ -79,14 +80,34 @@ const NetWorthChart = props => {
 
   const theme = useTheme()
 
+  const auth = useAuth0()
+
   const getData = useCallback(async () => {
     setIsLoading(true)
     try {
-      const response = await axios.post('/home/get-networth-by-time', { selectedDateOption, bankName })
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.post(
+        '/home/get-networth-by-time',
+        { selectedDateOption, bankName },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       const { data } = response
       setDistinctBanks(data[1])
 
-      const responseInvestment = await axios.post('/investimenti/get-chart', { selectedDateOption })
+      const responseInvestment = await axiosInstance.post(
+        '/investimenti/get-chart',
+        { selectedDateOption },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
 
       if (!onlyBanks) {
         const mergedArray = responseInvestment.data.map(item1 => {

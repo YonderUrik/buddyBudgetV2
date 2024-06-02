@@ -2,8 +2,7 @@ from mongo import BaseMongo
 import vars as VARS
 import utils as UTILS
 import logging
-from datetime import timedelta, datetime, date
-import copy
+from datetime import datetime
 import pandas as pd
 from bson.objectid import ObjectId
 
@@ -52,6 +51,7 @@ class TransazioniMongo(BaseMongo):
         
     def is_category_in_list(self, user_id=None, categoryId=None, operationType=None):
         try:
+            self.check_and_create_categories(user_id=user_id)
             result = self.client[user_id][VARS.SETTINGS_COLLECTION].find_one({"type": "budgetting-categories"})
 
             if result and operationType in result:
@@ -63,6 +63,7 @@ class TransazioniMongo(BaseMongo):
     
     def is_subcategory_in_list(self, user_id=None, categoryId=None, subCategoryId=None, operationType=None):
         try:
+            self.check_and_create_categories(user_id=user_id)
             result = self.client[user_id][VARS.SETTINGS_COLLECTION].find_one({"type": "budgetting-categories"})
 
             if result and operationType in result:

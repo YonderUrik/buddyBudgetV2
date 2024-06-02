@@ -1,34 +1,23 @@
-from flask import request, Blueprint, jsonify
-from werkzeug.security import check_password_hash
-from werkzeug.security import generate_password_hash
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import jwt_required
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import set_access_cookies
-from flask_jwt_extended import unset_jwt_cookies
-from flask_jwt_extended import create_refresh_token
-from flask_jwt_extended import set_refresh_cookies
+from flask import request, Blueprint
 import logging
-import utils as UTILS
 from home.mongo import HomeMongo
-from authentication.mongo import AuthMongo
 from investimenti.mongo import InvestimentiMongo
 from investimenti.functions import get_last_investment_networth
 import json
+from authentication.authentication import require_auth
+from authlib.integrations.flask_oauth2 import current_token
+
 
 bp = Blueprint('home', __name__, url_prefix='/api/home')
 logger = logging.getLogger(__name__)
 
 @bp.route('/get-income-vs-expense', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def get_income_vs_expense():
     try:
         selectedDateOption = request.json.get("selectedDateOption")
         
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
         
         mongo = HomeMongo()
         status, result = mongo.get_income_vs_expense(user_id=user_id, selectedDateOption=selectedDateOption)
@@ -44,15 +33,11 @@ def get_income_vs_expense():
         mongo.client.close()
 
 @bp.route('/get-expense-per-category', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def get_expense_per_category():
     try:
         selectedDateOption = request.json.get("selectedDateOption")
-        
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
         
         mongo = HomeMongo()
         status, result = mongo.get_expense_per_category(user_id=user_id, selectedDateOption=selectedDateOption)
@@ -68,13 +53,10 @@ def get_expense_per_category():
         mongo.client.close()
 
 @bp.route('/get-total-networth', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def get_total_networth():
     try:
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         mongo = HomeMongo()
         status, result = mongo.get_total_networth(user_id=user_id)
@@ -97,14 +79,10 @@ def get_total_networth():
         mongo.client.close()
 
 @bp.route('/get-conti-summary', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def get_conti_summary():
     try:
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
-
+        user_id = current_token['sub'].replace(".", '')
         mongo = HomeMongo()
         status, result = mongo.get_conti_summary(user_id=user_id)
 
@@ -120,16 +98,13 @@ def get_conti_summary():
         mongo.client.close()
 
 @bp.route('/get-networth-by-time', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def get_networth_by_time():
     try:
         selectedDateOption = request.json.get("selectedDateOption")
         bankName = request.json.get("bankName", None)
         
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         mongo = HomeMongo()
         status, result, distinct_banks = mongo.get_networth_by_time(user_id=user_id, selectedDateOption=selectedDateOption, bankName=bankName)
@@ -145,13 +120,10 @@ def get_networth_by_time():
         mongo.client.close()
     
 @bp.route('/get-categories', methods=["GET"])
-@jwt_required()
+@require_auth(None)
 def get_categories():
     try:
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         mongo = HomeMongo()
         status, res = mongo.get_categories(user_id=user_id)

@@ -21,8 +21,9 @@ import { useForm, Controller } from 'react-hook-form'
 import Icon from 'src/@core/components/icon'
 import { Autocomplete, CircularProgress, Stack, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material'
 import toast from 'react-hot-toast'
-import axios from 'src/utils/axios'
 import { LoadingButton } from '@mui/lab'
+import axiosInstance from 'src/utils/axios'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const Header = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -121,9 +122,20 @@ const EditTransactionDrawer = props => {
     resolver: yupResolver(schema)
   })
 
+  const auth = useAuth0()
+
   const onSubmit = async data => {
     try {
-      await axios.post('/transazioni/edit-transaction', { data, id: row._id })
+      const token = await auth.getAccessTokenSilently()
+      await axiosInstance.post(
+        '/transazioni/edit-transaction',
+        { data, id: row._id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       toast.success('Transazione modificata')
       reset()
       refreshAllData()

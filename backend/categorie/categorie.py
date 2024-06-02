@@ -1,31 +1,18 @@
-from flask import request, Blueprint, jsonify
-from werkzeug.security import check_password_hash
-from werkzeug.security import generate_password_hash
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import jwt_required
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import set_access_cookies
-from flask_jwt_extended import unset_jwt_cookies
-from flask_jwt_extended import create_refresh_token
-from flask_jwt_extended import set_refresh_cookies
+from flask import request, Blueprint
 import logging
-import utils as UTILS
-from authentication.mongo import AuthMongo
 import json
-from datetime import datetime
 from categorie.mongo import CategorieMongo
+from authentication.authentication import require_auth
+from authlib.integrations.flask_oauth2 import current_token
 
 bp = Blueprint('categorie', __name__, url_prefix='/api/categorie')
 logger = logging.getLogger(__name__)
 
 @bp.route('/get-categories-statistics', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def get_categories_statistics():
     try:
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         selectedDateOption = request.json.get("selectedDateOption")
 
@@ -44,13 +31,10 @@ def get_categories_statistics():
         mongo.client.close()
 
 @bp.route('/edit-subcategory-name', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def edit_sub_category_name():
     try:
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         category_id = int(request.json.get("category_id"))
         sub_category_id = int(request.json.get("sub_category_id"))
@@ -76,13 +60,10 @@ def edit_sub_category_name():
         mongo.client.close()
 
 @bp.route('/edit-category-name', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def edit_category_name():
     try:
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
         
         category_id = int(request.json.get("category_id"))
         new_category_name = str(request.json.get("new_category_name"))

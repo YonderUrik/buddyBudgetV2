@@ -1,7 +1,8 @@
+import { useAuth0 } from '@auth0/auth0-react'
 import { Box, Card, CardContent, CircularProgress, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import axios from 'src/utils/axios'
+import axiosInstance from 'src/utils/axios'
 import DateOptionsMenu from 'src/utils/date-options'
 import { dateOptions } from 'src/views/pages/home/card-income-vs-expense'
 import MainCategoryRow from 'src/views/pages/statistics/mainCategoryRow'
@@ -17,10 +18,22 @@ const Statistiche = () => {
   const filteredList = list.find(ls => ls._id === transactionType)
   const filteredCategories = categoriesList[transactionType]
 
+  const auth = useAuth0()
+
   const getList = useCallback(async () => {
     setIsLoading(true)
     try {
-      const response = await axios.post('/categorie/get-categories-statistics', { selectedDateOption })
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.post(
+        '/categorie/get-categories-statistics',
+        { selectedDateOption },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       const { data } = response
       setList(data)
     } catch (error) {
@@ -33,7 +46,13 @@ const Statistiche = () => {
   const getCategories = useCallback(async () => {
     setIsLoading(true)
     try {
-      const response = await axios.get('/home/get-categories')
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.get('/home/get-categories', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
       const { data } = response
       setCategoriesList(data)
     } catch (error) {

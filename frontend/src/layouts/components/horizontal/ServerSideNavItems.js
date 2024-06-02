@@ -1,17 +1,26 @@
 // ** React Imports
+import { useAuth0 } from '@auth0/auth0-react'
 import { useEffect, useState } from 'react'
 
 // ** Axios Import
-import axios from 'axios'
+import axiosInstance from 'src/utils/axios'
 
 const ServerSideNavItems = () => {
   // ** State
   const [menuItems, setMenuItems] = useState([])
-  useEffect(() => {
-    axios.get('/api/horizontal-nav/data').then(response => {
-      const menuArray = response.data
-      setMenuItems(menuArray)
-    })
+  const auth = useAuth0()
+  useEffect(async () => {
+    const token = await auth.getAccessTokenSilently()
+    axiosInstance
+      .get('/api/horizontal-nav/data', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      .then(response => {
+        const menuArray = response.data
+        setMenuItems(menuArray)
+      })
   }, [])
 
   return { menuItems }

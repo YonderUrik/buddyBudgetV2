@@ -2,7 +2,7 @@ from mongo import BaseMongo
 import vars as VARS
 import utils as UTILS
 import logging
-from datetime import timedelta, datetime, date, timezone
+from datetime import timedelta, datetime, date
 import copy
 
 def fill_missing_data(data, distinct_banks, end_date):
@@ -130,6 +130,10 @@ class HomeMongo(BaseMongo):
             status, categories = self.get_categories(user_id=user_id)
             if status == False:
                 raise Exception(categories)
+            
+            if not result or not categories:
+                return True, []
+             
             categories = categories['out']
 
             categories = {doc['category_id'] : doc['category_name'] for doc in categories}
@@ -277,6 +281,7 @@ class HomeMongo(BaseMongo):
         
     def get_categories(self, user_id=None):
         try:
+            self.check_and_create_categories(user_id=user_id)
             return 200, self.client[user_id][VARS.SETTINGS_COLLECTION].find_one({"type": "budgetting-categories"})
         except Exception as e:
             return 500, str(e)

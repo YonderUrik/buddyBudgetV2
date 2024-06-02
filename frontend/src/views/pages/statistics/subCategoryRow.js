@@ -1,9 +1,10 @@
+import { useAuth0 } from '@auth0/auth0-react'
 import { LoadingButton } from '@mui/lab'
 import { Box, IconButton, TextField, Tooltip, Typography } from '@mui/material'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import Icon from 'src/@core/components/icon'
-import axios from 'src/utils/axios'
+import axiosInstance from 'src/utils/axios'
 
 import { fCurrency } from 'src/utils/format-number'
 
@@ -18,16 +19,27 @@ const SubCategoryRow = props => {
     setEditedSubCategory(event.target.value)
   }
 
+  const auth = useAuth0()
+
   const handleSaveSubCategoryEdit = async event => {
     event.stopPropagation()
     try {
       setIsSaving(true)
-      await axios.post('/categorie/edit-subcategory-name', {
-        category_id: category_id,
-        sub_category_id: subcategory.subcategory_id,
-        new_sub_category_name: editedSubCategory,
-        transaction_type: transactionType
-      })
+      const token = await auth.getAccessTokenSilently()
+      await axiosInstance.post(
+        '/categorie/edit-subcategory-name',
+        {
+          category_id: category_id,
+          sub_category_id: subcategory.subcategory_id,
+          new_sub_category_name: editedSubCategory,
+          transaction_type: transactionType
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       toast.success('Nome sotto-categoria modificato')
       setIsEditing(false)
     } catch (error) {

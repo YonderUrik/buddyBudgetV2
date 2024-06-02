@@ -13,6 +13,7 @@
     "build:icons": "node src/iconify-bundle/bundle-icons-react.js"
   },
   "dependencies": {
+    "@auth0/auth0-react": "^2.2.4",
     "@babel/core": "7.21.3",
     "@babel/eslint-parser": "7.21.3",
     "@capacitor/assets": "^3.0.4",

@@ -1,31 +1,19 @@
-from flask import request, Blueprint, jsonify
-from werkzeug.security import check_password_hash
-from werkzeug.security import generate_password_hash
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import jwt_required
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import set_access_cookies
-from flask_jwt_extended import unset_jwt_cookies
-from flask_jwt_extended import create_refresh_token
-from flask_jwt_extended import set_refresh_cookies
+from flask import request, Blueprint
 import logging
-import utils as UTILS
 from transazioni.mongo import TransazioniMongo
-from authentication.mongo import AuthMongo
 import json
 from datetime import datetime
+from authentication.authentication import require_auth
+from authlib.integrations.flask_oauth2 import current_token
 
 bp = Blueprint('transazioni', __name__, url_prefix='/api/transazioni')
 logger = logging.getLogger(__name__)
 
 @bp.route('/get-last-transactions', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def get_last_transactions():
     try:
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         mongo = TransazioniMongo()
 
@@ -42,13 +30,10 @@ def get_last_transactions():
         mongo.client.close()
 
 @bp.route('/get-transactions', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def get_transactions():
     try:
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         page = int(request.json.get('page'))
         pageSize = int(request.json.get('pageSize'))
@@ -71,13 +56,10 @@ def get_transactions():
         mongo.client.close()
 
 @bp.route('/delete-transaction', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def delete_transaction():
     try:
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         _id = str(request.json.get("_id"))
 
@@ -96,13 +78,10 @@ def delete_transaction():
         mongo.client.close()
 
 @bp.route('/add-transaction', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def add_transaction():
     try:
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         request_json = dict(request.json)
 
@@ -177,13 +156,10 @@ def add_transaction():
         mongo.client.close()
 
 @bp.route('/edit-transaction', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def edit_transaction():
     try:
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         data = request.json.get("data")
         id = request.json.get("id")

@@ -1,3 +1,4 @@
+import { useAuth0 } from '@auth0/auth0-react'
 import { useEffect, useState } from 'react'
 import IconifyIcon from 'src/@core/components/icon'
 import axiosInstance from 'src/utils/axios'
@@ -44,10 +45,22 @@ const PositionTable = () => {
     setSortOrder(newSortOrder)
   }
 
+  const auth = useAuth0()
+
   const getRows = async () => {
     try {
       setIsLoading(true)
-      const response = await axiosInstance.post('/investimenti/get-positions-data', {})
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.post(
+        '/investimenti/get-positions-data',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       const { data } = response
 
       const isAscending = sortOrder === 'asc'

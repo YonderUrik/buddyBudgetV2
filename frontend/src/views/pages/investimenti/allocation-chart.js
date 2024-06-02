@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react'
 import axiosInstance from 'src/utils/axios'
 import { CircularProgress, Tab, Tabs } from '@mui/material'
 import { fCurrency } from 'src/utils/format-number'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const AllocationChart = () => {
   // ** Hook
@@ -23,10 +24,22 @@ const AllocationChart = () => {
     setSelectedTab(newValue)
   }
 
+  const auth = useAuth0()
+
   const getAllocazione = async () => {
     try {
       setIsLoading(true)
-      const response = await axiosInstance.post('/investimenti/get-allocation-infos', {})
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.post(
+        '/investimenti/get-allocation-infos',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       const { data } = response
 
       setAllocazioneInfo(data)

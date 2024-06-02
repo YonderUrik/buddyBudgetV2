@@ -12,11 +12,12 @@ import Icon from 'src/@core/components/icon'
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
 import { dateOptions } from './card-income-vs-expense'
 import { useCallback, useEffect, useState } from 'react'
-import axios from 'src/utils/axios'
 import toast from 'react-hot-toast'
 import { Box, Button, CircularProgress, Typography } from '@mui/material'
 import { fCurrency } from 'src/utils/format-number'
 import { useRouter } from 'next/router'
+import axiosInstance from 'src/utils/axios'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const ExpensePerCategory = props => {
   // ** Hook
@@ -36,10 +37,22 @@ const ExpensePerCategory = props => {
     }
   ]
 
+  const auth = useAuth0()
+
   const getData = useCallback(async () => {
     setIsLoading(true)
     try {
-      const response = await axios.post('/home/get-expense-per-category', { selectedDateOption })
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.post(
+        '/home/get-expense-per-category',
+        { selectedDateOption },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       const { data } = response
       setCategories(data.map(category => category.categoryId))
       setTotalAmounts(data.map(amount => amount.totalAmount))

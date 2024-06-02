@@ -16,8 +16,9 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 import DateOptionsMenu from 'src/utils/date-options'
-import axios from 'src/utils/axios'
 import { fCurrency, fPercent } from 'src/utils/format-number'
+import axiosInstance from 'src/utils/axios'
+import { useAuth0 } from '@auth0/auth0-react'
 
 export const dateOptions = [
   'mese corrente',
@@ -39,10 +40,21 @@ const CardIncomeVsExpense = props => {
   const [isLoading, setIsLoading] = useState(false)
   const [selectedDateOption, setSelectedDateOption] = useState(dateOptions[0])
 
+  const auth = useAuth0()
+
   const getData = useCallback(async () => {
     setIsLoading(true)
+    const token = await auth.getAccessTokenSilently()
     try {
-      const response = await axios.post('/home/get-income-vs-expense', { selectedDateOption })
+      const response = await axiosInstance.post(
+        '/home/get-income-vs-expense',
+        { selectedDateOption },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       const { data } = response
       setIncome(data[0])
       setExpense(data[1])

@@ -5,9 +5,10 @@ import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Box, FormControl, Stack, TextField, Typography } from '@mui/material'
 
-import axios from 'src/utils/axios'
 import { DatePicker } from '@mui/x-date-pickers'
 import { LoadingButton } from '@mui/lab'
+import axiosInstance from 'src/utils/axios'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const AddNewBank = props => {
   const { refreshData } = props
@@ -24,6 +25,8 @@ const AddNewBank = props => {
     lastUpdate: yup.date().nullable().max(new Date(), 'La data non può essere nel futuro').required('Data obbligatoria')
   })
 
+  const auth = useAuth0()
+
   const {
     reset,
     control,
@@ -39,7 +42,12 @@ const AddNewBank = props => {
 
   const onSubmit = async data => {
     try {
-      await axios.post('/conti/add-conto', data)
+      const token = await auth.getAccessTokenSilently()
+      await axiosInstance.post('/conti/add-conto', data, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
       toast.success('Conto aggiunto con successo')
       reset()
       refreshData()

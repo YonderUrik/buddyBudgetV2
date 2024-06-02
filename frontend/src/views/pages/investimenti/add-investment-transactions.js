@@ -34,6 +34,7 @@ import axiosInstance from 'src/utils/axios'
 import { LoadingButton } from '@mui/lab'
 import { DatePicker } from '@mui/x-date-pickers'
 import { GridExpandMoreIcon } from '@mui/x-data-grid'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const Header = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -50,6 +51,7 @@ const AddInvestmentTransaction = props => {
   const [quotes, setQuotes] = useState([])
   const [ownQuotes, setOwnQuotes] = useState([])
   const [selectedStock, setSelectedStock] = useState(null)
+  const auth = useAuth0()
 
   const handleClose = () => {
     setOpen(false)
@@ -74,7 +76,17 @@ const AddInvestmentTransaction = props => {
   const getMyQuotes = async () => {
     try {
       setIsLoading(true)
-      const response = await axiosInstance.post('/investimenti/get-my-stock', {})
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.post(
+        '/investimenti/get-my-stock',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       const { data } = response
       setOwnQuotes(data)
     } catch (error) {
@@ -90,7 +102,13 @@ const AddInvestmentTransaction = props => {
   const onSubmit = async newData => {
     try {
       setIsLoading(true)
-      const response = await axiosInstance.post('/investimenti/search', newData)
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.post('/investimenti/search', newData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
       const { data } = response
       setQuotes(data.quotes)
     } catch (error) {
@@ -260,9 +278,20 @@ const AddStockInfo = props => {
     resolver: yupResolver(schema)
   })
 
+  const auth = useAuth0()
+
   const onSubmit = async newData => {
     try {
-      await axiosInstance.post('/investimenti/add-transaction', { stockInfo, transactionData: newData })
+      const token = await auth.getAccessTokenSilently()
+      await axiosInstance.post(
+        '/investimenti/add-transaction',
+        { stockInfo, transactionData: newData },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       toast.success('Transazione aggiunta')
       reset()
       handleClose()

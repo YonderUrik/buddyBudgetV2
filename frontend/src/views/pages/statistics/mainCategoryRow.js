@@ -15,9 +15,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 import { fCurrency } from 'src/utils/format-number'
 import Icon from 'src/@core/components/icon'
-import axios from 'src/utils/axios'
-import { LoadingButton } from '@mui/lab'
 import SubCategoryRow from './subCategoryRow'
+import axiosInstance from 'src/utils/axios'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const MainCategoryRow = props => {
   const { category, categoryStats, transactionType } = props
@@ -30,16 +30,26 @@ const MainCategoryRow = props => {
   const handleCategoryNameChange = event => {
     setEditedCategoryName(event.target.value)
   }
+  const auth = useAuth0()
 
   const handleSaveCategoryEdit = async event => {
     event.stopPropagation()
     try {
       setIsSaving(true)
-      await axios.post('/categorie/edit-category-name', {
-        category_id: category.category_id,
-        new_category_name: editedCategoryName,
-        transaction_type: transactionType
-      })
+      const token = await auth.getAccessTokenSilently()
+      await axiosInstance.post(
+        '/categorie/edit-category-name',
+        {
+          category_id: category.category_id,
+          new_category_name: editedCategoryName,
+          transaction_type: transactionType
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       toast.success('Nome categoria modificato')
       setIsEditing(false)
     } catch (error) {

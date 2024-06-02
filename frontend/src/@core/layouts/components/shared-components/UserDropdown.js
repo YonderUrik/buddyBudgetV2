@@ -18,7 +18,7 @@ import Typography from '@mui/material/Typography'
 import Icon from 'src/@core/components/icon'
 
 // ** Context
-import { useAuth } from 'src/hooks/useAuth'
+import { useAuth0 } from '@auth0/auth0-react'
 
 // ** Styled Components
 const BadgeContentSpan = styled('span')(({ theme }) => ({
@@ -38,7 +38,7 @@ const UserDropdown = props => {
 
   // ** Hooks
   const router = useRouter()
-  const { user, logout } = useAuth()
+  const auth = useAuth0()
 
   // ** Vars
   const { direction } = settings
@@ -55,8 +55,7 @@ const UserDropdown = props => {
   }
 
   const handleLogout = () => {
-    logout()
-    handleDropdownClose()
+    auth?.logout({ logoutParams: { returnTo: `${window.location.origin}/login` } })
   }
 
   return (
@@ -71,7 +70,12 @@ const UserDropdown = props => {
           horizontal: 'right'
         }}
       >
-        <Avatar alt={user?.firstName} onClick={handleDropdownOpen} sx={{ width: 40, height: 40 }} />
+        <Avatar
+          src={auth?.user?.picture}
+          alt={auth?.user?.name}
+          onClick={handleDropdownOpen}
+          sx={{ width: 40, height: 40 }}
+        />
       </Badge>
       <Menu
         anchorEl={anchorEl}
@@ -91,23 +95,17 @@ const UserDropdown = props => {
                 horizontal: 'right'
               }}
             >
-              <Avatar alt={user?.firstName} sx={{ width: '2.5rem', height: '2.5rem' }} />
+              <Avatar src={auth?.user?.picture} alt={auth?.user?.name} sx={{ width: '2.5rem', height: '2.5rem' }} />
             </Badge>
             <Box sx={{ display: 'flex', ml: 3, alignItems: 'flex-start', flexDirection: 'column' }}>
-              <Typography sx={{ fontWeight: 600 }}>{user?.firstName}</Typography>
+              <Typography sx={{ fontWeight: 600 }}>{auth?.user?.name}</Typography>
               <Typography variant='body2' sx={{ fontSize: '0.8rem', color: 'text.disabled' }}>
-                {user?.email}
+                {auth?.user?.email}
               </Typography>
             </Box>
           </Box>
         </Box>
         <Divider sx={{ mt: '0 !important' }} />
-        {/* <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
-          <Box sx={styles}>
-            <Icon icon='mdi:account-outline' />
-            Profile
-          </Box>
-        </MenuItem> */}
         <Divider />
         <MenuItem
           onClick={handleLogout}

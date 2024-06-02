@@ -1,11 +1,6 @@
 from mongo import BaseMongo
 import vars as VARS
 import utils as UTILS
-import logging
-from datetime import timedelta, datetime, date
-import copy
-import pandas as pd
-from bson.objectid import ObjectId
 
 def edit_category_name(data, category_id, new_category_name):
     for category in data:
@@ -33,6 +28,7 @@ class CategorieMongo(BaseMongo):
 
     def edit_sub_category(self, user_id=None, category_id=None, sub_category_id=None, new_sub_category_name=None, transaction_type=None):
         try:
+            self.check_and_create_categories(user_id=user_id)
             collection = self.client[user_id][VARS.SETTINGS_COLLECTION]
 
             categories = collection.find_one({"type": "budgetting-categories"})
@@ -51,6 +47,7 @@ class CategorieMongo(BaseMongo):
 
     def edit_category_name(self, user_id=None, category_id=None, new_category_name=None, transaction_type=None):
         try:
+            self.check_and_create_categories(user_id=user_id)
             collection = self.client[user_id][VARS.SETTINGS_COLLECTION]
             categories = collection.find_one({"type": "budgetting-categories"})
 

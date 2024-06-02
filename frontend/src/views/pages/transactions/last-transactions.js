@@ -13,7 +13,6 @@ import Typography from '@mui/material/Typography'
 import CardHeader from '@mui/material/CardHeader'
 import TableContainer from '@mui/material/TableContainer'
 
-import axios from 'src/utils/axios'
 import { fDate } from 'src/utils/format-time'
 import { fCurrency } from 'src/utils/format-number'
 
@@ -22,6 +21,8 @@ import EditTransactionDrawer from './edit-transaction'
 import { useRouter } from 'next/router'
 import { Button, Skeleton } from '@mui/material'
 import Icon from 'src/@core/components/icon'
+import axiosInstance from 'src/utils/axios'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const LastsTransactions = props => {
   const { refreshAllData, balanceview } = props
@@ -30,9 +31,21 @@ const LastsTransactions = props => {
   const [categories, setCategories] = useState({})
   const router = useRouter()
 
+  const auth = useAuth0()
+
   const getDataList = useCallback(async () => {
     try {
-      const response = await axios.post('/transazioni/get-last-transactions', {})
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.post(
+        '/transazioni/get-last-transactions',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       const { data } = response
       setDataList(data)
     } catch (error) {
@@ -45,7 +58,13 @@ const LastsTransactions = props => {
   const getCategories = useCallback(async () => {
     try {
       setIsLoading(true)
-      const response = await axios.get('/home/get-categories')
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.get('/home/get-categories', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
       const { data } = response
       setCategories(data)
     } catch (error) {

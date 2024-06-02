@@ -6,17 +6,28 @@ import { IconButton, Tooltip } from '@mui/material'
 
 import ConfirmDialog from 'src/@core/components/confirm-dialog'
 import Icon from 'src/@core/components/icon'
-import axios from 'src/utils/axios'
+import axiosInstance from 'src/utils/axios'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const DeleteTransaction = props => {
   const { refreshAllData, _id } = props
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const auth = useAuth0()
 
   const submitDelete = async () => {
     setIsDeleting(true)
     try {
-      await axios.post('/transazioni/delete-transaction', { _id })
+      const token = await auth.getAccessTokenSilently()
+      await axiosInstance.post(
+        '/transazioni/delete-transaction',
+        { _id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       toast.success('Transazione eliminata')
       refreshAllData()
     } catch (error) {

@@ -3,11 +3,12 @@ import { useState } from 'react'
 
 import { Typography, Box, Card, CardHeader, Button, Popover, MenuItem } from '@mui/material'
 
-import axios from 'src/utils/axios'
 import DateOptionsMenu from 'src/utils/date-options'
 import { dateOptions } from 'src/views/pages/home/card-income-vs-expense'
 import Icon from 'src/@core/components/icon'
 import TransactionTable from 'src/views/pages/transactions/transaction-table'
+import axiosInstance from 'src/utils/axios'
+import { useAuth0 } from '@auth0/auth0-react'
 
 export const SORT_OPTIONS = [
   { value: -1, label: 'Più recenti', field: 'date' },
@@ -30,17 +31,28 @@ const Transazioni = () => {
   const [dataList, setDataList] = useState([])
   const [dataCount, setDataCount] = useState(0)
 
+  const auth = useAuth0()
+
   const getDataList = async newPaginationModel => {
     try {
       setIsLoading(true)
+      const token = await auth.getAccessTokenSilently()
 
-      const response = await axios.post('/transazioni/get-transactions', {
-        page: newPaginationModel.page + 1,
-        pageSize: newPaginationModel.pageSize,
-        sort: newPaginationModel.sort,
-        filter: newPaginationModel.filter,
-        selectedDateOption: newPaginationModel.selectedDateOption
-      })
+      const response = await axiosInstance.post(
+        '/transazioni/get-transactions',
+        {
+          page: newPaginationModel.page + 1,
+          pageSize: newPaginationModel.pageSize,
+          sort: newPaginationModel.sort,
+          filter: newPaginationModel.filter,
+          selectedDateOption: newPaginationModel.selectedDateOption
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       const { data } = response
       setDataList(data[0])
       setDataCount(data[1])

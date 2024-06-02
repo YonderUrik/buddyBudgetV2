@@ -7,6 +7,7 @@ import { fCurrency, fPercent, fShortenNumber } from 'src/utils/format-number'
 import { fDate } from 'src/utils/format-time'
 import { dateOptions } from '../home/card-income-vs-expense'
 import DateOptionsMenu from 'src/utils/date-options'
+import { useAuth0 } from '@auth0/auth0-react'
 
 function calculateEarnings(currentValue, investedValue) {
   // Calculate percentage
@@ -28,10 +29,22 @@ const TotalNetWorthCard = () => {
 
   const { percentage, amount } = calculateEarnings(currentValue, investedValue)
 
+  const auth = useAuth0()
+
   const getData = useCallback(async () => {
     try {
       setIsLoading(true)
-      const response = await axiosInstance.post('/investimenti/get-chart', { selectedDateOption })
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.post(
+        '/investimenti/get-chart',
+        { selectedDateOption },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       const { data } = response
       setData(data)
     } catch (error) {
@@ -42,7 +55,17 @@ const TotalNetWorthCard = () => {
 
   const getLastInfos = async () => {
     try {
-      const response = await axiosInstance.post('/investimenti/get-last-infos', { selectedDateOption })
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.post(
+        '/investimenti/get-last-infos',
+        { selectedDateOption },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       const { data } = response
       setCurrentValue(data[0])
       setInvestedValue(data[1])

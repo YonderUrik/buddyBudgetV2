@@ -3,7 +3,6 @@ from requests import Session
 from requests_cache import CacheMixin, SQLiteCache
 from requests_ratelimiter import LimiterMixin, MemoryQueueBucket
 from pyrate_limiter import Duration, RequestRate, Limiter
-import requests_cache
 import pandas as pd
 import utils as UTILS
 
@@ -138,6 +137,10 @@ def get_allocazione(transactions=None, historical_data=None, stocks_info=None):
 # TODO : inserire ancora le transazioni di tipo sell e earn
 def get_last_investment_networth(transactions=None, historical_data=None, selectedDateOption=None):
     dati_storici_dict = {record["date_symbol"]: record["Close"] for record in historical_data}
+
+    if not transactions:
+        return 0 
+    
     prima_transazione = transactions[0]["date"].replace(hour=0, minute=0, second=0)
 
     contatore_quantita = {}
@@ -168,6 +171,9 @@ def get_last_investment_networth(transactions=None, historical_data=None, select
 
 # TODO : inserire ancora le transazioni di tipo sell e earn
 def calculate_investment_networth(transactions=None, historical_data=None, selectedDateOption=None):
+    if not transactions:
+        return []
+    
     prima_transazione = transactions[0]["date"].replace(hour=0, minute=0, second=0)
     oggi = datetime.utcnow()
 

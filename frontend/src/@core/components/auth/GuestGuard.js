@@ -5,11 +5,11 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 
 // ** Hooks Import
-import { useAuth } from 'src/hooks/useAuth'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const GuestGuard = props => {
   const { children, fallback } = props
-  const auth = useAuth()
+  const auth = useAuth0()
   const router = useRouter()
 
   useEffect(() => {
@@ -17,7 +17,7 @@ const GuestGuard = props => {
       return
     }
 
-    if (!auth.loading && auth.user) {
+    if (!auth.isLoading && auth.isAuthenticated) {
       if (router?.query?.returnUrl) {
         router.replace(router?.query?.returnUrl)
       } else {
@@ -26,28 +26,11 @@ const GuestGuard = props => {
     }
   }, [router.route])
 
-  if (auth.loading || !router.isReady) {
+  if (auth.isLoading || !router.isReady) {
     return fallback
   }
 
   return <>{children}</>
-
-  // useEffect(() => {
-  //   if (!router.isReady) {
-  //     return
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [router.route])
-
-  // if (auth.user !== null) {
-  //   router.replace('/')
-  // }
-
-  // if (auth.loading) {
-  //   return fallback
-  // }
-
-  // return <>{children}</>
 }
 
 export default GuestGuard

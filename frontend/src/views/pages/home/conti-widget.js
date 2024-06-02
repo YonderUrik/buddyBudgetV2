@@ -20,17 +20,29 @@ import axio from 'src/utils/axios'
 import toast from 'react-hot-toast'
 import { Button } from '@mui/material'
 import { useRouter } from 'next/router'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const ContiWidget = props => {
   const { balanceview } = props
   const [conti, setConti] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const auth = useAuth0()
 
   const getData = useCallback(async () => {
     setIsLoading(true)
     try {
-      const response = await axio.post('/home/get-conti-summary', {})
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axio.post(
+        '/home/get-conti-summary',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       const { data } = response
       setConti(data)
     } catch (error) {

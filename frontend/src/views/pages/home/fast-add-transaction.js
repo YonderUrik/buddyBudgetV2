@@ -4,25 +4,35 @@ import Card from '@mui/material/Card'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 import Grid from '@mui/material/Grid'
-import { useAuth } from 'src/hooks/useAuth'
 import Icon from 'src/@core/components/icon'
 import { useCallback, useEffect, useState } from 'react'
 import { fCurrency } from 'src/utils/format-number'
 import toast from 'react-hot-toast'
-import axios from 'src/utils/axios'
 import { IconButton, Tooltip } from '@mui/material'
 import AddTransactionDrawer from '../transactions/add-transaction-drawer'
+import { useAuth0 } from '@auth0/auth0-react'
+import axiosInstance from 'src/utils/axios'
 
 const FastAddTransaction = props => {
   // ** Hook
   const [netWorth, setNetWorth] = useState(0)
-  const auth = useAuth()
+  const auth = useAuth0()
 
   const { onChangeShowBalance, balanceview, refreshAllData } = props
 
   const getData = useCallback(async () => {
     try {
-      const response = await axios.post('/home/get-total-networth', {})
+      const token = await auth.getAccessTokenSilently()
+
+      const response = await axiosInstance.post(
+        '/home/get-total-networth',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       const { data } = response
       setNetWorth(data)
     } catch (error) {

@@ -1,29 +1,19 @@
-from flask import request, Blueprint, jsonify
-from werkzeug.security import check_password_hash
-from werkzeug.security import generate_password_hash
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import jwt_required
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import set_access_cookies
-from flask_jwt_extended import unset_jwt_cookies
-from flask_jwt_extended import create_refresh_token
-from flask_jwt_extended import set_refresh_cookies
+from flask import request, Blueprint
 import logging
-import utils as UTILS
-from authentication.mongo import AuthMongo
 from investimenti.mongo import InvestimentiMongo
 import json
-from datetime import datetime
 import vars as VARS
 import requests
 import investimenti.functions as FUNC
 from requests import Session
-from requests_cache import CacheMixin, SQLiteCache
-from requests_ratelimiter import LimiterMixin, MemoryQueueBucket
-from pyrate_limiter import Duration, RequestRate, Limiter
+from requests_cache import CacheMixin
+from requests_ratelimiter import LimiterMixin
 import requests_cache
 import yfinance as yf
 import pandas as pd
+from authentication.authentication import require_auth
+from authlib.integrations.flask_oauth2 import current_token
+
 
 bp = Blueprint('investimenti', __name__, url_prefix='/api/investimenti')
 logger = logging.getLogger(__name__)
@@ -32,7 +22,7 @@ class CachedLimiterSession(CacheMixin, LimiterMixin, Session):
     pass
 
 @bp.route('/search', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def search():
     try:
         symbol = str(request.json.get('symbol'))
@@ -40,9 +30,6 @@ def search():
         url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/auto-complete"
 
         querystring = {"q":symbol}
-
-        print(VARS.XRapidAPIKey)
-        print(str(VARS.XRapidAPIKey))
 
         headers = {
             "X-RapidAPI-Key": VARS.XRapidAPIKey,
@@ -57,16 +44,13 @@ def search():
         return {"message" : "Qualcosa non ha funzionato"}, 500
     
 @bp.route('/add-transaction', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def add_transaction():
     try:
         stockInfo = dict(request.json.get("stockInfo"))
         transactionData = dict(request.json.get("transactionData"))
 
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         transactionData['symbol'] = stockInfo['symbol']
 
@@ -107,13 +91,10 @@ def add_transaction():
         mongo.client.close()
     
 @bp.route('/get-my-stock', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def get_my_stock():
     try:
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         mongo = InvestimentiMongo()
         status, result = mongo.get_my_stocks(user_id=user_id)
@@ -129,14 +110,11 @@ def get_my_stock():
         mongo.client.close()
 
 @bp.route('/get-chart', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def get_chart():
     try:
         selectedDateOption = request.json.get("selectedDateOption", None)
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         mongo = InvestimentiMongo()
 
@@ -154,14 +132,11 @@ def get_chart():
         mongo.client.close()
 
 @bp.route('/get-last-infos', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def get_last_infos():
     try:
-        mongo = AuthMongo()
         selectedDateOption = request.json.get("selectedDateOption", None)
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         mongo = InvestimentiMongo()
         transactions = mongo.get_transaction_by_type(user_id=user_id)
@@ -183,13 +158,10 @@ def get_last_infos():
         mongo.client.close()
 
 @bp.route('/get-allocation-infos', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def get_allocation_infos():
     try:
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         mongo = InvestimentiMongo()
         transactions = mongo.get_transaction_by_type(user_id=user_id)
@@ -208,13 +180,10 @@ def get_allocation_infos():
         mongo.client.close()
 
 @bp.route('/get-positions-data', methods=["POST"])
-@jwt_required()
+@require_auth(None)
 def get_positions_data():
     try:
-        mongo = AuthMongo()
-        _user_email = get_jwt_identity()['email']
-        user_details = mongo.get_user_by_email(_user_email)
-        user_id = str(user_details['_id'])
+        user_id = current_token['sub'].replace(".", '')
 
         mongo = InvestimentiMongo()
         transactions = mongo.get_transaction_by_type(user_id=user_id)
